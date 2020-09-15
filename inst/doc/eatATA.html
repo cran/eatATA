@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Benjamin Becker" />
+
+<meta name="date" content="2020-09-07" />
+
+<title>Typical Use of eatATA: a Case-Based Example</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Typical Use of eatATA: a Case-Based Example</h1>
+<h4 class="author">Benjamin Becker</h4>
+<h4 class="date">2020-09-07</h4>
+
+
+
+<p><code>eatATA</code> efficiently translates test design requirements for Automated Test Assembly (ATA) into constraints for a Mixed Integer Linear Programming Model (MILP). A number of efficient and user-friendly functions are available, and the resulting matrix of constrains can be easily transformed to be in line with a MILP solver, like the <code>Gurobi</code> solver. In the remainder of this vignette I will illustrate the typical use of <code>eatATA</code> using a case-based example.</p>
+<div id="setup" class="section level2">
+<h2>Setup</h2>
+<p>The <code>eatATA</code> package can be installed from GitHub. Note that older R versions had issues with installations from online repositories like GitHub. <code>R</code> version <code>&gt; 3.6.0</code> should work without any issues.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;beckerbenj/eatATA&quot;</span>)</code></pre></div>
+<p>To use <code>eatATA</code>, you also need to install the <code>Gurobi</code> solver and its corresponding <code>R</code> package. A detailed vignette on the installation process can be found <a href="https://CRAN.R-project.org/package=prioritizr/vignettes/gurobi_installation.html">here</a>.</p>
+<p>First, <code>eatATA</code> is loaded into your <code>R</code> session.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># loading eatATA</span>
+<span class="kw">library</span>(eatATA)</code></pre></div>
+</div>
+<div id="item-pool" class="section level2">
+<h2>Item pool</h2>
+<p>No ATA without an item pool. In this example I use a fictional example item pool of 80 items. The item pool information is stored as an <code>excel</code> file that is included in the package. To import the item pool information into <code>R</code> I recommend using the package <code>readxl</code>. This package imports the data as a <code>tibble</code>, but in the code below, the item pool is immediately transformed into a <code>data.frame</code>.</p>
+<p>Note that <code>R</code> requires a rectangular data set. Yet, often excel files store additional information in rows above or below the &quot;rectangular&quot; item pool information. The <code>skip</code> argument in the <code>read_excel()</code> function can be used to skip unnecessary rows in the <code>excel</code> file. (Note that the item pool can also be directly accessed in the package via <code>items</code>; see <code>?items</code> for more information.)</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">items_path &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;items.xlsx&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;eatATA&quot;</span>)
+
+items &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="dt">path =</span> items_path), <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p>Inspection of the item pool indicates that the items have different properties: item format (<code>MC</code>, <code>CMC</code>, <code>short_answer</code>, or <code>open</code>), difficulty (<code>diff_1</code> - <code>diff_5</code>), average response times in minutes (<code>RT_in_min</code>). In addition, similar items can not be in the same booklet or test form. This information is stored in the column <code>exclusions</code>, which indicates which items are too similar and should not be in the same booklet with the item in that row..</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(items)
+<span class="co">#&gt;   Item_ID                exclusions RT_in_min subitems MC CMC short_answer open</span>
+<span class="co">#&gt; 1 item_00          item_01, item_06       1.0        1 NA  NA            1   NA</span>
+<span class="co">#&gt; 2 item_01          item_00, item_06       1.5        1 NA  NA            1   NA</span>
+<span class="co">#&gt; 3 item_02 item_04, item_63, item_62       2.0        1 NA  NA           NA    1</span>
+<span class="co">#&gt; 4 item_03                      &lt;NA&gt;       1.5        1 NA  NA            1   NA</span>
+<span class="co">#&gt; 5 item_04 item_02, item_63, item_62       1.5        1 NA  NA            1   NA</span>
+<span class="co">#&gt; 6 item_05                      &lt;NA&gt;       1.0        1 NA  NA            1   NA</span>
+<span class="co">#&gt;   diff_1 diff_2 diff_3 diff_4 diff_5</span>
+<span class="co">#&gt; 1      1     NA     NA     NA     NA</span>
+<span class="co">#&gt; 2     NA      1     NA     NA     NA</span>
+<span class="co">#&gt; 3     NA     NA      1     NA     NA</span>
+<span class="co">#&gt; 4     NA     NA      1     NA     NA</span>
+<span class="co">#&gt; 5     NA      1     NA     NA     NA</span>
+<span class="co">#&gt; 6      1     NA     NA     NA     NA</span></code></pre></div>
+</div>
+<div id="prepare-item-information" class="section level2">
+<h2>Prepare item information</h2>
+<p>Before defining the constraints, item pool data has to be in the correct format. For instance, some dummy variables (indicator variables) in the item pool use both <code>NA</code> and <code>0</code> to indicate &quot;the category does not apply&quot;. Therefore, the dummy variables should be transformed so that there are only two values (1 = &quot;the category applies&quot;, and 0 = &quot;the category does not apply&quot;).</p>
+<p>Often a set of dummy variables can be summarized into a single factor variable. This is automatically done by the function <code>dummiesToFactor()</code>. However, the function can only be used when the categories are mutually exclusive. For instance, in the example item pool, items can contain sub-items with different format or difficulties. As a result, some items contain two sub-items with different formats. Therefore, in this example, the <code>dummiesToFactor()</code> function throws an error and cannot be used.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># clean data set (categorical dummy variables must contain only 0 and 1)</span>
+items &lt;-<span class="st"> </span><span class="kw">dummiesToFactor</span>(items, <span class="dt">dummies =</span> <span class="kw">c</span>(<span class="st">&quot;MC&quot;</span>, <span class="st">&quot;CMC&quot;</span>, <span class="st">&quot;short_answer&quot;</span>, <span class="st">&quot;open&quot;</span>), <span class="dt">facVar =</span> <span class="st">&quot;itemFormat&quot;</span>)
+<span class="co">#&gt; Error in dummiesToFactor(items, dummies = c(&quot;MC&quot;, &quot;CMC&quot;, &quot;short_answer&quot;, : All values in the 'dummies' columns have to be 0, 1 or NA.</span>
+items &lt;-<span class="st"> </span><span class="kw">dummiesToFactor</span>(items, <span class="dt">dummies =</span> <span class="kw">paste0</span>(<span class="st">&quot;diff_&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>), <span class="dt">facVar =</span> <span class="st">&quot;itemDiff&quot;</span>)
+<span class="co">#&gt; Error in dummiesToFactor(items, dummies = paste0(&quot;diff_&quot;, 1:5), facVar = &quot;itemDiff&quot;): All values in the 'dummies' columns have to be 0, 1 or NA.</span>
+items[<span class="kw">c</span>(<span class="dv">24</span>, <span class="dv">33</span>, <span class="dv">37</span>, <span class="dv">47</span>, <span class="dv">48</span>, <span class="dv">54</span>, <span class="dv">76</span>), ]
+<span class="co">#&gt;    Item_ID       exclusions RT_in_min subitems MC CMC short_answer open diff_1</span>
+<span class="co">#&gt; 24 item_23             &lt;NA&gt;       3.5        2  1   1           NA   NA     NA</span>
+<span class="co">#&gt; 33 item_32          item_36       1.5        2 NA  NA            2   NA      1</span>
+<span class="co">#&gt; 37 item_36 item_27, item_32       1.5        2 NA  NA            2   NA      1</span>
+<span class="co">#&gt; 47 item_46 item_54, item_44       2.5        2 NA  NA            2   NA     NA</span>
+<span class="co">#&gt; 48 item_47 item_45, item_37       2.0        2 NA  NA            2   NA     NA</span>
+<span class="co">#&gt; 54 item_53 item_43, item_59       2.5        2 NA  NA            2   NA     NA</span>
+<span class="co">#&gt; 76 item_75             &lt;NA&gt;       1.5        2 NA  NA            2   NA     NA</span>
+<span class="co">#&gt;    diff_2 diff_3 diff_4 diff_5</span>
+<span class="co">#&gt; 24     NA      2     NA     NA</span>
+<span class="co">#&gt; 33     NA      1     NA     NA</span>
+<span class="co">#&gt; 37      1     NA     NA     NA</span>
+<span class="co">#&gt; 47      1      1     NA     NA</span>
+<span class="co">#&gt; 48     NA      1      1     NA</span>
+<span class="co">#&gt; 54      1      1     NA     NA</span>
+<span class="co">#&gt; 76     NA      1      1     NA</span></code></pre></div>
+<p>In addition, the column <code>short_answer</code> can have NA as a value, and is consequently not a dummy variable. Therefore, I will (a) treat <code>short_answer</code> as a numerical value, (b) collapse <code>MC</code> and <code>open</code> into a new factor <code>MC_open_none</code>, (these dummies are mutually exclusive), and (c) turn <code>CMC</code> and the difficulty indicators into factors. (See <code>?autoItemValuesMinMax</code> and <code>?computeTargetValues</code> for further information on the different treatment of factors and numerical variables.)</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># make new factor with three levels: &quot;MC&quot;, &quot;open&quot; and &quot;else&quot;</span>
+items &lt;-<span class="st"> </span><span class="kw">dummiesToFactor</span>(items, <span class="dt">dummies =</span> <span class="kw">c</span>(<span class="st">&quot;MC&quot;</span>, <span class="st">&quot;open&quot;</span>), <span class="dt">facVar =</span> <span class="st">&quot;MC_open_none&quot;</span>)
+<span class="co">#&gt; Warning in dummiesToFactor(items, dummies = c(&quot;MC&quot;, &quot;open&quot;), facVar = &quot;MC_open_none&quot;): For these rows, there is no dummy variable equal to 1: 1, 2, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 17, 20, 21, 25, 28, 29, 30, 32, 33, 34, 36, 37, 38, 39, 40, 41, 44, 45, 46, 47, 48, 50, 54, 55, 58, 60, 65, 67, 68, 69, 70, 72, 74, 76, 77, 79, 80</span>
+<span class="co">#&gt; A '_none_ 'category is created for these rows.</span>
+<span class="co"># clean data set (NA should be 0)</span>
+<span class="cf">for</span>(ty <span class="cf">in</span> <span class="kw">c</span>(<span class="kw">paste0</span>(<span class="st">&quot;diff_&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>), <span class="st">&quot;CMC&quot;</span>, <span class="st">&quot;short_answer&quot;</span>)){
+  items[, ty] &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">is.na</span>(items[, ty]), <span class="dt">yes =</span> <span class="dv">0</span>, <span class="dt">no =</span> items[, ty])
+}
+<span class="co"># make factors of CMC dummi</span>
+items<span class="op">$</span>f_CMC &lt;-<span class="st"> </span><span class="kw">factor</span>(items<span class="op">$</span>CMC, <span class="dt">labels =</span> <span class="kw">paste</span>(<span class="st">&quot;CMC&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;no&quot;</span>, <span class="st">&quot;yes&quot;</span>), <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>))
+
+<span class="co"># example item format</span>
+<span class="kw">table</span>(items<span class="op">$</span>short_answer)
+<span class="co">#&gt; </span>
+<span class="co">#&gt;  0  1  2 </span>
+<span class="co">#&gt; 34 38  8</span></code></pre></div>
+</div>
+<div id="ata-goal" class="section level2">
+<h2>ATA goal</h2>
+<p>In this example, the goal is to assemble 14 booklets out of the 80 items item pool. All items should be assigned to one (and only one booklet), so that there is no item overlap and the item pool is completely depleted.</p>
+<p>To be more precise, the required constraints are:</p>
+<ul>
+<li><p>no item overlap between test blocks</p></li>
+<li><p>complete item pool depletion</p></li>
+<li><p>equal distribution of item formats across test blocks</p></li>
+<li><p>equal difficulty distribution across test blocks</p></li>
+<li><p>some items can not be together in the same booklet (item exclusions)</p></li>
+<li><p>as similar as possible response times across booklets</p></li>
+</ul>
+<p>For ease of use, I set up two variables that I will use frequently: the number of test forms or booklets to be created (<code>nForms</code>) and the number of items in the item pool (<code>nItems</code>).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set up fixed variables</span>
+nItems &lt;-<span class="st"> </span><span class="kw">nrow</span>(items)  <span class="co"># number of items</span>
+nForms &lt;-<span class="st"> </span><span class="dv">14</span>           <span class="co"># number of blocks</span></code></pre></div>
+</div>
+<div id="set-up-constraints" class="section level2">
+<h2>Set up constraints</h2>
+<p><code>eatATA</code> offers a variety of function the automatically compute the constraints mentioned above.</p>
+<p>The first two constraints (no item overlap and item pool depletion) can be implemented by a single function: <code>itemUsageConstraint()</code>. To achieve this, the <code>operator</code> argument should be set to <code>&quot;=&quot;</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">itemOverlap &lt;-<span class="st"> </span><span class="kw">itemUsageConstraint</span>(nForms, <span class="dt">nItems =</span> nItems, <span class="dt">operator =</span> <span class="st">&quot;=&quot;</span>) </code></pre></div>
+<p>Constraints with respect to categorical variables or factors (like <code>MC_open_none</code>) or numerical variables (like <code>short_answer</code>), can be easily implemented using the <code>autoItemValuesMinMax()</code> function. The result of this function depends on whether a factor or a numerical variable is used. That is, <code>autoItemValuesMinMax()</code> automatically determines the minimum and maximum frequency of each category of a factor. But for numerical variables, it automatically determines the target value.</p>
+<p>The <code>allowedDeviation</code> argument specifies the allowed range between booklets regarding the category or the numerical value. If the argument is omitted, it defaults to &quot;no deviation is allowed&quot; for numerical values, and to the minimal possible deviation for categorical variables or factors. Hence, for numeric values, I will specify <code>allowedDeviation = 1</code>. The function prints the calculated target value or the resulting allowed value range on booklet level.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># item formats</span>
+mc_openItems &lt;-<span class="st"> </span><span class="kw">autoItemValuesMinMax</span>(<span class="dt">nForms =</span> nForms, <span class="dt">itemValues =</span> items<span class="op">$</span>MC_open_none)
+<span class="co">#&gt; The minimum and maximum frequences per test form for each item category are</span>
+<span class="co">#&gt;        min max</span>
+<span class="co">#&gt; MC       1   2</span>
+<span class="co">#&gt; _none_   3   4</span>
+<span class="co">#&gt; open     0   1</span>
+cmcItems &lt;-<span class="st"> </span><span class="kw">autoItemValuesMinMax</span>(<span class="dt">nForms =</span> nForms, <span class="dt">itemValues =</span> items<span class="op">$</span>f_CMC)
+<span class="co">#&gt; The minimum and maximum frequences per test form for each item category are</span>
+<span class="co">#&gt;         min max</span>
+<span class="co">#&gt; CMC_no    5   6</span>
+<span class="co">#&gt; CMC_yes   0   1</span>
+saItems &lt;-<span class="st"> </span><span class="kw">autoItemValuesMinMax</span>(<span class="dt">nForms =</span> nForms, <span class="dt">itemValues =</span> items<span class="op">$</span>short_answer, <span class="dt">allowedDeviation =</span> <span class="dv">1</span>)
+<span class="co">#&gt; The minimum and maximum values per test form are: min = 2.86 - max = 4.86</span>
+
+<span class="co"># difficulty categories</span>
+Items1 &lt;-<span class="st"> </span><span class="kw">autoItemValuesMinMax</span>(<span class="dt">nForms =</span> nForms, <span class="dt">itemValues =</span> items<span class="op">$</span>diff_<span class="dv">1</span>, <span class="dt">allowedDeviation =</span> <span class="dv">1</span>)
+<span class="co">#&gt; The minimum and maximum values per test form are: min = 0 - max = 2</span>
+Items2 &lt;-<span class="st"> </span><span class="kw">autoItemValuesMinMax</span>(<span class="dt">nForms =</span> nForms, <span class="dt">itemValues =</span> items<span class="op">$</span>diff_<span class="dv">2</span>, <span class="dt">allowedDeviation =</span> <span class="dv">1</span>)
+<span class="co">#&gt; The minimum and maximum values per test form are: min = 0.57 - max = 2.57</span>
+Items3 &lt;-<span class="st"> </span><span class="kw">autoItemValuesMinMax</span>(<span class="dt">nForms =</span> nForms, <span class="dt">itemValues =</span> items<span class="op">$</span>diff_<span class="dv">3</span>, <span class="dt">allowedDeviation =</span> <span class="dv">1</span>)
+<span class="co">#&gt; The minimum and maximum values per test form are: min = 1.64 - max = 3.64</span>
+Items4 &lt;-<span class="st"> </span><span class="kw">autoItemValuesMinMax</span>(<span class="dt">nForms =</span> nForms, <span class="dt">itemValues =</span> items<span class="op">$</span>diff_<span class="dv">4</span>, <span class="dt">allowedDeviation =</span> <span class="dv">1</span>)
+<span class="co">#&gt; The minimum and maximum values per test form are: min = 0 - max = 1.86</span>
+Items5 &lt;-<span class="st"> </span><span class="kw">autoItemValuesMinMax</span>(<span class="dt">nForms =</span> nForms, <span class="dt">itemValues =</span> items<span class="op">$</span>diff_<span class="dv">5</span>, <span class="dt">allowedDeviation =</span> <span class="dv">1</span>)
+<span class="co">#&gt; The minimum and maximum values per test form are: min = 0 - max = 1.29</span></code></pre></div>
+<p>To implement item exclusion constraints, two function can be used: <code>itemExclusionTuples()</code> and <code>itemExclusionConstraint()</code>. When item exclusions are supplied as a single character string for each item, with item identifiers separated by <code>&quot;, &quot;</code>, they should be transformed first.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># item exclusions variable</span>
+items<span class="op">$</span>exclusions[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]
+<span class="co">#&gt; [1] &quot;item_01, item_06&quot;          &quot;item_00, item_06&quot;         </span>
+<span class="co">#&gt; [3] &quot;item_04, item_63, item_62&quot; NA                         </span>
+<span class="co">#&gt; [5] &quot;item_02, item_63, item_62&quot;</span></code></pre></div>
+<p>This transformation can be done using the <code>itemExclusionTuples()</code> function, which creates so called <em>tuples</em>: pairs of exclusive items. These <em>tuples</em> can be used directly with the <code>itemExclusionConstraint()</code> function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># item exclusions</span>
+exclusionTuples &lt;-<span class="st"> </span><span class="kw">itemExclusionTuples</span>(items, <span class="dt">idCol =</span> <span class="st">&quot;Item_ID&quot;</span>, 
+                                       <span class="dt">exclusions =</span> <span class="st">&quot;exclusions&quot;</span>, <span class="dt">sepPattern =</span> <span class="st">&quot;, &quot;</span>)
+excl_constraints &lt;-<span class="st"> </span><span class="kw">itemExclusionConstraint</span>(<span class="dt">nForms =</span> <span class="dv">14</span>, <span class="dt">exclusionTuples =</span> exclusionTuples, 
+                                            <span class="dt">itemIDs =</span> items<span class="op">$</span>Item_ID)</code></pre></div>
+<p>Another helpful function is the <code>itemsPerFormConstraint()</code> function, which constrains the number of items per test forms. However, since this is not required in this example, I will not use these constraints in the final ATA constraints.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># number of items per test form</span>
+min_Nitems &lt;-<span class="st"> </span><span class="kw">floor</span>(nItems <span class="op">/</span><span class="st"> </span>nForms) <span class="op">-</span><span class="st"> </span><span class="dv">3</span>
+noItems &lt;-<span class="st"> </span><span class="kw">itemsPerFormConstraint</span>(<span class="dt">nForms =</span> nForms, <span class="dt">nItems =</span> nItems, 
+                                  <span class="dt">operator =</span> <span class="st">&quot;&gt;=&quot;</span>, min_Nitems)</code></pre></div>
+<p>Finally, I am setting up an optimization constraint. This constraint is not a clear <em>yes</em> or <em>no</em> constraint, and it does not have to be attained perfectly. Instead, the solver will minimize the distance of the actual booklet value for all booklets towards a target value. In our example, we specify 10 minutes as the target response time <code>RT_in_min</code> for all booklets.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># optimize average time</span>
+av_time &lt;-<span class="st"> </span><span class="kw">itemTargetConstraint</span>(nForms, <span class="dt">nItems =</span> nItems, <span class="dt">itemValues =</span> items<span class="op">$</span>RT_in_min, <span class="dt">targetValue =</span> <span class="dv">10</span>)</code></pre></div>
+</div>
+<div id="prepare-constraints-and-run-solver" class="section level2">
+<h2>Prepare constraints and run solver</h2>
+<p>Before calling the optimization algorithm the specified constraints should be formatted to be in line with <code>Gurobi</code>. First, I collect all the constraints that should be used in a <code>list</code>, which I then use in the <code>prepareConstraints()</code> function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Prepare constraints</span>
+gurobi_constr &lt;-<span class="st"> </span><span class="kw">list</span>(itemOverlap, mc_openItems, cmcItems, saItems, 
+                      Items1, Items2, Items3, Items4, Items5, excl_constraints,
+                      av_time)
+
+gurobi_rdy &lt;-<span class="st"> </span><span class="kw">prepareConstraints</span>(gurobi_constr, <span class="dt">nForms =</span> nForms, <span class="dt">nItems =</span> nItems)</code></pre></div>
+<p>Now I can call <code>Gurobis</code> <code>gurobi()</code> function, which will solve the optimization problem. Using the <code>params</code> argument you can set options and parameters of the solver. By setting the <code>TimeLimit</code> to 30, I limit <code>Gurobi</code> to stop searching for an optimal solution after 30 seconds. For most small test assembly problems, however, computation times will be much shorter.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(gurobi)
+
+<span class="co"># Optimization</span>
+solver_raw &lt;-<span class="st"> </span><span class="kw">gurobi</span>(gurobi_rdy, <span class="dt">params =</span> <span class="kw">list</span>(<span class="dt">TimeLimit =</span> <span class="dv">30</span>))</code></pre></div>
+<p>If the problem is feasible (which means that there is at least one solution that satisfies all the constraints), the output printed by <code>Gurobi</code> will look like this:</p>
+<pre><code>#&gt; Optimize a model with 990 rows, 1121 columns and 9324 nonzeros
+#&gt; Variable types: 1 continuous, 1120 integer (1120 binary)
+#&gt; Coefficient statistics:
+#&gt;   Matrix range     [1e+00, 4e+00]
+#&gt;   Objective range  [1e+00, 1e+00]
+#&gt;   Bounds range     [0e+00, 0e+00]
+#&gt;   RHS range        [5e-01, 1e+01]
+#&gt; Found heuristic solution: objective 3.5000000
+#&gt; Presolve removed 392 rows and 0 columns
+#&gt; Presolve time: 0.01s
+#&gt; Presolved: 598 rows, 1121 columns, 8204 nonzeros
+#&gt; Variable types: 0 continuous, 1121 integer (1120 binary)
+#&gt; 
+#&gt; Root relaxation: objective 2.857143e-01, 476 iterations, 0.01 seconds
+#&gt; 
+#&gt;     Nodes    |    Current Node    |     Objective Bounds      |     Work
+#&gt;  Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+#&gt; 
+#&gt;      0     0    0.28571    0   41    3.50000    0.28571  91.8%     -    0s
+#&gt; H    0     0                       1.5000000    0.28571  81.0%     -    0s
+#&gt; H    0     0                       1.0000000    0.28571  71.4%     -    0s
+#&gt; H    0     0                       0.5000000    0.28571  42.9%     -    0s
+#&gt; 
+#&gt; Explored 1 nodes (1119 simplex iterations) in 0.07 seconds
+#&gt; Thread count was 8 (of 8 available processors)
+#&gt; 
+#&gt; Solution count 4: 0.5 1 1.5 3.5 
+#&gt; 
+#&gt; Optimal solution found (tolerance 1.00e-04)
+#&gt; Best objective 5.000000000000e-01, best bound 5.000000000000e-01, gap 0.0000%</code></pre>
+<p>If the problem is unfeasible, the output printed by <code>Gurobi</code> will look like this:</p>
+<pre><code>#&gt; Optimize a model with 1004 rows, 1121 columns and 10444 nonzeros
+#&gt; Variable types: 1 continuous, 1120 integer (1120 binary)
+#&gt; Coefficient statistics:
+#&gt;   Matrix range     [1e+00, 4e+00]
+#&gt;   Objective range  [1e+00, 1e+00]
+#&gt;   Bounds range     [0e+00, 0e+00]
+#&gt;   RHS range        [5e-01, 8e+01]
+#&gt; Presolve removed 70 rows and 1120 columns
+#&gt; Presolve time: 0.00s
+#&gt; 
+#&gt; Explored 0 nodes (0 simplex iterations) in 0.00 seconds
+#&gt; Thread count was 1 (of 8 available processors)
+#&gt; 
+#&gt; Solution count 0
+#&gt; 
+#&gt; Model is infeasible
+#&gt; Best objective -, best bound -, gap -</code></pre>
+<p>If the latter happens, one option is to relax some of the constraints. Further, for first diagnostic purposes you can omit some constraints completely, to see which constraints are especially challenging. If you have a better grasp of the possibilities of the item pool, you can add these constraints back, but for example with larger <code>allowedDeviations</code>.</p>
+</div>
+<div id="inspect-solution" class="section level2">
+<h2>Inspect Solution</h2>
+<p>The solution provided by <code>Gurobi</code> can be inspected using the <code>processGurobiOutput()</code> function. If the <code>output</code> argument is set to <code>&quot;list&quot;</code>, you get a list output which is easy to read. If the <code>output</code> argument to <code>&quot;data.frame&quot;</code>, you get an output optimized for exporting, for example to <code>excel</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out_list &lt;-<span class="st"> </span><span class="kw">processGurobiOutput</span>(solver_raw, <span class="dt">items =</span> items, <span class="dt">nForms =</span> nForms, <span class="dt">output =</span> <span class="st">&quot;list&quot;</span>)
+
+## first two booklets
+out_list[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]
+<span class="co">#&gt; [[1]]</span>
+<span class="co">#&gt;    Item_ID       exclusions RT_in_min subitems MC CMC short_answer open diff_1</span>
+<span class="co">#&gt; 21 item_20          item_45       2.0        1 NA   0            1   NA      0</span>
+<span class="co">#&gt; 24 item_23             &lt;NA&gt;       3.5        2  1   1            0   NA      0</span>
+<span class="co">#&gt; 36 item_35             &lt;NA&gt;       1.5        1 NA   0            1   NA      0</span>
+<span class="co">#&gt; 42 item_41          item_26       1.0        1  1   0            0   NA      0</span>
+<span class="co">#&gt; 48 item_47 item_45, item_37       2.0        2 NA   0            2   NA      0</span>
+<span class="co">#&gt;    diff_2 diff_3 diff_4 diff_5 MC_open_none   f_CMC form_1 form_2 form_3 form_4</span>
+<span class="co">#&gt; 21      0      1      0      0       _none_  CMC_no      1      0      0      0</span>
+<span class="co">#&gt; 24      0      2      0      0           MC CMC_yes      1      0      0      0</span>
+<span class="co">#&gt; 36      0      0      0      1       _none_  CMC_no      1      0      0      0</span>
+<span class="co">#&gt; 42      1      0      0      0           MC  CMC_no      1      0      0      0</span>
+<span class="co">#&gt; 48      0      1      1      0       _none_  CMC_no      1      0      0      0</span>
+<span class="co">#&gt;    form_5 form_6 form_7 form_8 form_9 form_10 form_11 form_12 form_13 form_14</span>
+<span class="co">#&gt; 21      0      0      0      0      0       0       0       0       0       0</span>
+<span class="co">#&gt; 24      0      0      0      0      0       0       0       0       0       0</span>
+<span class="co">#&gt; 36      0      0      0      0      0       0       0       0       0       0</span>
+<span class="co">#&gt; 42      0      0      0      0      0       0       0       0       0       0</span>
+<span class="co">#&gt; 48      0      0      0      0      0       0       0       0       0       0</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[2]]</span>
+<span class="co">#&gt;    Item_ID                exclusions RT_in_min subitems MC CMC short_answer</span>
+<span class="co">#&gt; 2  item_01          item_00, item_06       1.5        1 NA   0            1</span>
+<span class="co">#&gt; 19 item_18          item_48, item_56       2.0        1  1   0            0</span>
+<span class="co">#&gt; 20 item_19                   item_76       1.5        1 NA   0            1</span>
+<span class="co">#&gt; 60 item_59 item_53, item_43, item_29       1.5        1 NA   0            1</span>
+<span class="co">#&gt; 62 item_61                   item_60       3.0        1 NA   0            0</span>
+<span class="co">#&gt;    open diff_1 diff_2 diff_3 diff_4 diff_5 MC_open_none  f_CMC form_1 form_2</span>
+<span class="co">#&gt; 2    NA      0      1      0      0      0       _none_ CMC_no      0      1</span>
+<span class="co">#&gt; 19   NA      0      0      0      1      0           MC CMC_no      0      1</span>
+<span class="co">#&gt; 20   NA      0      0      1      0      0       _none_ CMC_no      0      1</span>
+<span class="co">#&gt; 60   NA      0      1      0      0      0       _none_ CMC_no      0      1</span>
+<span class="co">#&gt; 62    1      0      0      1      0      0         open CMC_no      0      1</span>
+<span class="co">#&gt;    form_3 form_4 form_5 form_6 form_7 form_8 form_9 form_10 form_11 form_12</span>
+<span class="co">#&gt; 2       0      0      0      0      0      0      0       0       0       0</span>
+<span class="co">#&gt; 19      0      0      0      0      0      0      0       0       0       0</span>
+<span class="co">#&gt; 20      0      0      0      0      0      0      0       0       0       0</span>
+<span class="co">#&gt; 60      0      0      0      0      0      0      0       0       0       0</span>
+<span class="co">#&gt; 62      0      0      0      0      0      0      0       0       0       0</span>
+<span class="co">#&gt;    form_13 form_14</span>
+<span class="co">#&gt; 2        0       0</span>
+<span class="co">#&gt; 19       0       0</span>
+<span class="co">#&gt; 20       0       0</span>
+<span class="co">#&gt; 60       0       0</span>
+<span class="co">#&gt; 62       0       0</span></code></pre></div>
+<p>In this case I also want to assemble the created booklets into test forms. Therefore, I am interested in booklet exclusions that can result from item exclusions. The <code>analyzeBlockExclusion()</code> function can be used to obtain tuples with booklet exclusions.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">analyzeBlockExclusion</span>(<span class="dt">processedObj =</span> out_list, <span class="dt">idCol =</span> <span class="st">&quot;Item_ID&quot;</span>, <span class="dt">exclusionTuples =</span> exclusionTuples)
+<span class="co">#&gt;      Name 1   Name 2</span>
+<span class="co">#&gt; 1   block 2  block 4</span>
+<span class="co">#&gt; 2   block 4  block 9</span>
+<span class="co">#&gt; 3   block 2  block 9</span>
+<span class="co">#&gt; 4   block 8  block 9</span>
+<span class="co">#&gt; 5  block 14  block 9</span>
+<span class="co">#&gt; 6   block 5  block 9</span>
+<span class="co">#&gt; 7  block 14  block 8</span>
+<span class="co">#&gt; 8   block 5  block 8</span>
+<span class="co">#&gt; 9  block 10  block 9</span>
+<span class="co">#&gt; 10 block 10  block 6</span>
+<span class="co">#&gt; 11 block 14  block 6</span>
+<span class="co">#&gt; 12  block 6  block 8</span>
+<span class="co">#&gt; 14 block 10  block 7</span>
+<span class="co">#&gt; 15 block 10 block 14</span>
+<span class="co">#&gt; 16 block 10  block 8</span>
+<span class="co">#&gt; 19  block 2  block 7</span>
+<span class="co">#&gt; 20  block 2  block 5</span>
+<span class="co">#&gt; 22  block 1  block 5</span>
+<span class="co">#&gt; 23 block 10 block 13</span>
+<span class="co">#&gt; 24  block 3  block 9</span>
+<span class="co">#&gt; 25  block 1 block 11</span>
+<span class="co">#&gt; 28  block 3  block 5</span>
+<span class="co">#&gt; 30 block 12  block 5</span>
+<span class="co">#&gt; 31  block 1 block 12</span>
+<span class="co">#&gt; 33 block 11  block 6</span>
+<span class="co">#&gt; 34  block 5  block 7</span>
+<span class="co">#&gt; 36 block 14  block 3</span>
+<span class="co">#&gt; 37 block 14  block 7</span>
+<span class="co">#&gt; 39  block 3  block 7</span>
+<span class="co">#&gt; 41 block 12  block 8</span>
+<span class="co">#&gt; 43  block 2  block 8</span>
+<span class="co">#&gt; 44 block 14  block 5</span>
+<span class="co">#&gt; 45 block 11  block 4</span></code></pre></div>
+</div>
+<div id="save-as-excel" class="section level2">
+<h2>Save as Excel</h2>
+<p>Finally, when the solution should be exported as an <code>excel</code> file (<code>.xlsx</code>), This can, for example, be achieved via the <code>eatAnalysis</code> package, which has to be installed from <code>Github</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;beckerbenj/eatAnalysis&quot;</span>)
+out_df &lt;-<span class="st"> </span><span class="kw">processGurobiOutput</span>(solver_raw, <span class="dt">items =</span> items, <span class="dt">nForms =</span> nForms, <span class="dt">output =</span> <span class="st">&quot;data.frame&quot;</span>)
+
+eatAnalysis<span class="op">::</span><span class="kw">write_xlsx</span>(out_df, <span class="dt">filePath =</span> <span class="st">&quot;example_excel.xlsx&quot;</span>,
+                        <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
