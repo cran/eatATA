@@ -5,7 +5,7 @@ knitr::opts_chunk$set(
 )
 
 ## ----installation, eval = FALSE-----------------------------------------------
-#  devtools::install_github("beckerbenj/eatATA")
+#  install.packages("eatATA")
 
 ## ----library, message = FALSE-------------------------------------------------
 # loading eatATA
@@ -83,43 +83,35 @@ av_time <- itemTargetConstraint(nForms, nItems = nItems, itemValues = items$RT_i
 
 ## ----prepare constraints, eval = T--------------------------------------------
 # Prepare constraints
-gurobi_constr <- list(itemOverlap, mc_openItems, cmcItems, saItems, 
+constr_list <- list(itemOverlap, mc_openItems, cmcItems, saItems, 
                       Items1, Items2, Items3, Items4, Items5, excl_constraints,
                       av_time)
 
-gurobi_rdy <- prepareConstraints(gurobi_constr, nForms = nForms, nItems = nItems)
+## ----solver, eval = TRUE, message=TRUE----------------------------------------
+# Optimization
+solver_raw <- useSolver(constr_list, nForms = nForms, nItems = nItems, 
+                        itemIDs = items$Item_ID, solver = "GLPK", timeLimit = 10)
 
-## ----solver, eval = FALSE-----------------------------------------------------
-#  library(gurobi)
-#  
-#  # Optimization
-#  solver_raw <- gurobi(gurobi_rdy, params = list(TimeLimit = 30))
-#  
-
-## ----feasible output, eval = TRUE, echo = FALSE-------------------------------
-out_path <- system.file("extdata", "gurobi_out_feasible.RDS", package = "eatATA")
-cat(readRDS(out_path))
-
-## ----infeasible output, eval = TRUE, echo = FALSE-----------------------------
-out_path <- system.file("extdata", "gurobi_out_infeasible.RDS", package = "eatATA")
-cat(readRDS(out_path))
-
-## ----load solver output, eval = TRUE, echo = FALSE----------------------------
-solver_raw <- gurobiExample
 
 ## ----inspect solution---------------------------------------------------------
-out_list <- processGurobiOutput(solver_raw, items = items, nForms = nForms, output = "list")
+out_list <- inspectSolution(solver_raw, items = items, idCol = "Item_ID", colSums = TRUE,
+                            colNames = c("RT_in_min", "subitems", 
+                                         "MC", "CMC", "short_answer", "open",
+                                         paste0("diff_", 1:5)))
 
 ## first two booklets
 out_list[1:2]
 
 ## ----block exclusions---------------------------------------------------------
-analyzeBlockExclusion(processedObj = out_list, idCol = "Item_ID", exclusionTuples = exclusionTuples)
+analyzeBlockExclusion(solverOut = solver_raw, item = items, idCol = "Item_ID", 
+                      exclusionTuples = exclusionTuples)
 
+
+## ----append solution----------------------------------------------------------
+out_df <- appendSolution(solver_raw, items = items, idCol = "Item_ID")
 
 ## ----export solution to excel, eval = FALSE-----------------------------------
 #  devtools::install_github("beckerbenj/eatAnalysis")
-#  out_df <- processGurobiOutput(solver_raw, items = items, nForms = nForms, output = "data.frame")
 #  
 #  eatAnalysis::write_xlsx(out_df, filePath = "example_excel.xlsx",
 #                          row.names = FALSE)

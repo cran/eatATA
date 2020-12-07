@@ -12,7 +12,7 @@
 
 <meta name="author" content="Benjamin Becker" />
 
-<meta name="date" content="2020-09-07" />
+<meta name="date" content="2020-12-07" />
 
 <title>Typical Use of eatATA: a Case-Based Example</title>
 
@@ -95,16 +95,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Typical Use of eatATA: a Case-Based Example</h1>
 <h4 class="author">Benjamin Becker</h4>
-<h4 class="date">2020-09-07</h4>
+<h4 class="date">2020-12-07</h4>
 
 
 
-<p><code>eatATA</code> efficiently translates test design requirements for Automated Test Assembly (ATA) into constraints for a Mixed Integer Linear Programming Model (MILP). A number of efficient and user-friendly functions are available, and the resulting matrix of constrains can be easily transformed to be in line with a MILP solver, like the <code>Gurobi</code> solver. In the remainder of this vignette I will illustrate the typical use of <code>eatATA</code> using a case-based example.</p>
+<p><code>eatATA</code> efficiently translates test design requirements for Automated Test Assembly (<code>ATA</code>) into constraints for a Mixed Integer Linear Programming Model (MILP). A number of efficient and user-friendly functions are available, and the resulting matrix of constrains can be easily transformed to be in line with a MILP solver, like the <code>GLPK</code> or <code>Gurobi</code> solvers. In the remainder of this vignette I will illustrate the typical use of <code>eatATA</code> using a case-based example.</p>
 <div id="setup" class="section level2">
 <h2>Setup</h2>
-<p>The <code>eatATA</code> package can be installed from GitHub. Note that older R versions had issues with installations from online repositories like GitHub. <code>R</code> version <code>&gt; 3.6.0</code> should work without any issues.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;beckerbenj/eatATA&quot;</span>)</code></pre></div>
-<p>To use <code>eatATA</code>, you also need to install the <code>Gurobi</code> solver and its corresponding <code>R</code> package. A detailed vignette on the installation process can be found <a href="https://CRAN.R-project.org/package=prioritizr/vignettes/gurobi_installation.html">here</a>.</p>
+<p>The <code>eatATA</code> package can be installed from <code>CRAN</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;eatATA&quot;</span>)</code></pre></div>
+<p>As a default solver, we recommend <code>GLPK</code>, which is automatically installed alongside this package. If you want to use <code>Gurobi</code> as a solver (the most powerful and efficient solver currently implemented in <code>eatATA</code>), an external software installation and licensing is required. This means, you need to install the <code>Gurobi</code> solver and its corresponding <code>R</code> package. A detailed vignette on the installation process can be found <a href="https://CRAN.R-project.org/package=prioritizr/vignettes/gurobi_installation.html">here</a>. Note that currently <code>gurobi</code> works only under R versions &lt;= 3.6.3.</p>
 <p>First, <code>eatATA</code> is loaded into your <code>R</code> session.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># loading eatATA</span>
 <span class="kw">library</span>(eatATA)</code></pre></div>
@@ -248,165 +248,128 @@ noItems &lt;-<span class="st"> </span><span class="kw">itemsPerFormConstraint</s
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># optimize average time</span>
 av_time &lt;-<span class="st"> </span><span class="kw">itemTargetConstraint</span>(nForms, <span class="dt">nItems =</span> nItems, <span class="dt">itemValues =</span> items<span class="op">$</span>RT_in_min, <span class="dt">targetValue =</span> <span class="dv">10</span>)</code></pre></div>
 </div>
-<div id="prepare-constraints-and-run-solver" class="section level2">
-<h2>Prepare constraints and run solver</h2>
-<p>Before calling the optimization algorithm the specified constraints should be formatted to be in line with <code>Gurobi</code>. First, I collect all the constraints that should be used in a <code>list</code>, which I then use in the <code>prepareConstraints()</code> function.</p>
+<div id="run-solver" class="section level2">
+<h2>Run solver</h2>
+<p>Before calling the optimization algorithm the specified constraints are collected in a <code>list</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Prepare constraints</span>
-gurobi_constr &lt;-<span class="st"> </span><span class="kw">list</span>(itemOverlap, mc_openItems, cmcItems, saItems, 
+constr_list &lt;-<span class="st"> </span><span class="kw">list</span>(itemOverlap, mc_openItems, cmcItems, saItems, 
                       Items1, Items2, Items3, Items4, Items5, excl_constraints,
-                      av_time)
-
-gurobi_rdy &lt;-<span class="st"> </span><span class="kw">prepareConstraints</span>(gurobi_constr, <span class="dt">nForms =</span> nForms, <span class="dt">nItems =</span> nItems)</code></pre></div>
-<p>Now I can call <code>Gurobis</code> <code>gurobi()</code> function, which will solve the optimization problem. Using the <code>params</code> argument you can set options and parameters of the solver. By setting the <code>TimeLimit</code> to 30, I limit <code>Gurobi</code> to stop searching for an optimal solution after 30 seconds. For most small test assembly problems, however, computation times will be much shorter.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(gurobi)
-
-<span class="co"># Optimization</span>
-solver_raw &lt;-<span class="st"> </span><span class="kw">gurobi</span>(gurobi_rdy, <span class="dt">params =</span> <span class="kw">list</span>(<span class="dt">TimeLimit =</span> <span class="dv">30</span>))</code></pre></div>
-<p>If the problem is feasible (which means that there is at least one solution that satisfies all the constraints), the output printed by <code>Gurobi</code> will look like this:</p>
-<pre><code>#&gt; Optimize a model with 990 rows, 1121 columns and 9324 nonzeros
-#&gt; Variable types: 1 continuous, 1120 integer (1120 binary)
-#&gt; Coefficient statistics:
-#&gt;   Matrix range     [1e+00, 4e+00]
-#&gt;   Objective range  [1e+00, 1e+00]
-#&gt;   Bounds range     [0e+00, 0e+00]
-#&gt;   RHS range        [5e-01, 1e+01]
-#&gt; Found heuristic solution: objective 3.5000000
-#&gt; Presolve removed 392 rows and 0 columns
-#&gt; Presolve time: 0.01s
-#&gt; Presolved: 598 rows, 1121 columns, 8204 nonzeros
-#&gt; Variable types: 0 continuous, 1121 integer (1120 binary)
-#&gt; 
-#&gt; Root relaxation: objective 2.857143e-01, 476 iterations, 0.01 seconds
-#&gt; 
-#&gt;     Nodes    |    Current Node    |     Objective Bounds      |     Work
-#&gt;  Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
-#&gt; 
-#&gt;      0     0    0.28571    0   41    3.50000    0.28571  91.8%     -    0s
-#&gt; H    0     0                       1.5000000    0.28571  81.0%     -    0s
-#&gt; H    0     0                       1.0000000    0.28571  71.4%     -    0s
-#&gt; H    0     0                       0.5000000    0.28571  42.9%     -    0s
-#&gt; 
-#&gt; Explored 1 nodes (1119 simplex iterations) in 0.07 seconds
-#&gt; Thread count was 8 (of 8 available processors)
-#&gt; 
-#&gt; Solution count 4: 0.5 1 1.5 3.5 
-#&gt; 
-#&gt; Optimal solution found (tolerance 1.00e-04)
-#&gt; Best objective 5.000000000000e-01, best bound 5.000000000000e-01, gap 0.0000%</code></pre>
-<p>If the problem is unfeasible, the output printed by <code>Gurobi</code> will look like this:</p>
-<pre><code>#&gt; Optimize a model with 1004 rows, 1121 columns and 10444 nonzeros
-#&gt; Variable types: 1 continuous, 1120 integer (1120 binary)
-#&gt; Coefficient statistics:
-#&gt;   Matrix range     [1e+00, 4e+00]
-#&gt;   Objective range  [1e+00, 1e+00]
-#&gt;   Bounds range     [0e+00, 0e+00]
-#&gt;   RHS range        [5e-01, 8e+01]
-#&gt; Presolve removed 70 rows and 1120 columns
-#&gt; Presolve time: 0.00s
-#&gt; 
-#&gt; Explored 0 nodes (0 simplex iterations) in 0.00 seconds
-#&gt; Thread count was 1 (of 8 available processors)
-#&gt; 
-#&gt; Solution count 0
-#&gt; 
-#&gt; Model is infeasible
-#&gt; Best objective -, best bound -, gap -</code></pre>
-<p>If the latter happens, one option is to relax some of the constraints. Further, for first diagnostic purposes you can omit some constraints completely, to see which constraints are especially challenging. If you have a better grasp of the possibilities of the item pool, you can add these constraints back, but for example with larger <code>allowedDeviations</code>.</p>
+                      av_time)</code></pre></div>
+<p>Now I can call <code>useSolver()</code> function, which restructures the constraints internally and solves the optimization problem. Using the <code>solver</code> argument I specify <code>GLPK</code> as the solver (other alternatives are <code>lpSolve</code> and <code>Gurobi</code>). Using the <code>timeLimit</code> argument we set the time limit to 10. This means I limit the solver to stop searching for an optimal solution after 10 seconds. Note that the computation times might depend on the solver you have selected.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Optimization</span>
+solver_raw &lt;-<span class="st"> </span><span class="kw">useSolver</span>(constr_list, <span class="dt">nForms =</span> nForms, <span class="dt">nItems =</span> nItems, 
+                        <span class="dt">itemIDs =</span> items<span class="op">$</span>Item_ID, <span class="dt">solver =</span> <span class="st">&quot;GLPK&quot;</span>, <span class="dt">timeLimit =</span> <span class="dv">10</span>)
+<span class="co">#&gt; GLPK Simplex Optimizer, v4.47</span>
+<span class="co">#&gt; 1046 rows, 1121 columns, 12824 non-zeros</span>
+<span class="co">#&gt;       0: obj =  0.000000000e+000  infeas = 4.170e+002 (80)</span>
+<span class="co">#&gt; *   403: obj =  8.250000000e-001  infeas = 4.163e-017 (0)</span>
+<span class="co">#&gt; *   438: obj =  2.857142857e-001  infeas = 6.498e-029 (0)</span>
+<span class="co">#&gt; OPTIMAL SOLUTION FOUND</span>
+<span class="co">#&gt; GLPK Integer Optimizer, v4.47</span>
+<span class="co">#&gt; 1046 rows, 1121 columns, 12824 non-zeros</span>
+<span class="co">#&gt; 1120 integer variables, all of which are binary</span>
+<span class="co">#&gt; Integer optimization begins...</span>
+<span class="co">#&gt; +   438: mip =     not found yet &gt;=              -inf        (1; 0)</span>
+<span class="co">#&gt; +  5615: &gt;&gt;&gt;&gt;&gt;  2.000000000e+000 &gt;=  2.857142857e-001  85.7% (348; 8)</span>
+<span class="co">#&gt; + 10728: &gt;&gt;&gt;&gt;&gt;  1.500000000e+000 &gt;=  2.857142857e-001  81.0% (671; 134)</span>
+<span class="co">#&gt; + 21024: mip =  1.500000000e+000 &gt;=  2.857142857e-001  81.0% (1166; 588)</span>
+<span class="co">#&gt; + 21024: mip =  1.500000000e+000 &gt;=  2.857142857e-001  81.0% (1166; 588)</span>
+<span class="co">#&gt; TIME LIMIT EXCEEDED; SEARCH TERMINATED</span>
+<span class="co">#&gt; The solution is feasible, but may not be optimal</span></code></pre></div>
+<p>The function provides output that indicates whether an optimal solution has been found. In our case, a viable solution has been found but the function reached the time limit before finding the optimal solution.</p>
+<p>If there is no feasible solution, one option is to relax some of the constraints. Further, for first diagnostic purposes you can omit some constraints completely, to see which constraints are especially challenging. If you have a better grasp of the possibilities of the item pool, you can add these constraints back, but for example with larger <code>allowedDeviations</code>.</p>
 </div>
 <div id="inspect-solution" class="section level2">
 <h2>Inspect Solution</h2>
-<p>The solution provided by <code>Gurobi</code> can be inspected using the <code>processGurobiOutput()</code> function. If the <code>output</code> argument is set to <code>&quot;list&quot;</code>, you get a list output which is easy to read. If the <code>output</code> argument to <code>&quot;data.frame&quot;</code>, you get an output optimized for exporting, for example to <code>excel</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out_list &lt;-<span class="st"> </span><span class="kw">processGurobiOutput</span>(solver_raw, <span class="dt">items =</span> items, <span class="dt">nForms =</span> nForms, <span class="dt">output =</span> <span class="st">&quot;list&quot;</span>)
+<p>The solution provided by <code>eatATA</code> can be inspected using the <code>inspectSolution()</code> function. It allows me to inspect the assembled item blocks at a first glance, including some column sums.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out_list &lt;-<span class="st"> </span><span class="kw">inspectSolution</span>(solver_raw, <span class="dt">items =</span> items, <span class="dt">idCol =</span> <span class="st">&quot;Item_ID&quot;</span>, <span class="dt">colSums =</span> <span class="ot">TRUE</span>,
+                            <span class="dt">colNames =</span> <span class="kw">c</span>(<span class="st">&quot;RT_in_min&quot;</span>, <span class="st">&quot;subitems&quot;</span>, 
+                                         <span class="st">&quot;MC&quot;</span>, <span class="st">&quot;CMC&quot;</span>, <span class="st">&quot;short_answer&quot;</span>, <span class="st">&quot;open&quot;</span>,
+                                         <span class="kw">paste0</span>(<span class="st">&quot;diff_&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)))
 
 ## first two booklets
 out_list[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]
-<span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt;    Item_ID       exclusions RT_in_min subitems MC CMC short_answer open diff_1</span>
-<span class="co">#&gt; 21 item_20          item_45       2.0        1 NA   0            1   NA      0</span>
-<span class="co">#&gt; 24 item_23             &lt;NA&gt;       3.5        2  1   1            0   NA      0</span>
-<span class="co">#&gt; 36 item_35             &lt;NA&gt;       1.5        1 NA   0            1   NA      0</span>
-<span class="co">#&gt; 42 item_41          item_26       1.0        1  1   0            0   NA      0</span>
-<span class="co">#&gt; 48 item_47 item_45, item_37       2.0        2 NA   0            2   NA      0</span>
-<span class="co">#&gt;    diff_2 diff_3 diff_4 diff_5 MC_open_none   f_CMC form_1 form_2 form_3 form_4</span>
-<span class="co">#&gt; 21      0      1      0      0       _none_  CMC_no      1      0      0      0</span>
-<span class="co">#&gt; 24      0      2      0      0           MC CMC_yes      1      0      0      0</span>
-<span class="co">#&gt; 36      0      0      0      1       _none_  CMC_no      1      0      0      0</span>
-<span class="co">#&gt; 42      1      0      0      0           MC  CMC_no      1      0      0      0</span>
-<span class="co">#&gt; 48      0      1      1      0       _none_  CMC_no      1      0      0      0</span>
-<span class="co">#&gt;    form_5 form_6 form_7 form_8 form_9 form_10 form_11 form_12 form_13 form_14</span>
-<span class="co">#&gt; 21      0      0      0      0      0       0       0       0       0       0</span>
-<span class="co">#&gt; 24      0      0      0      0      0       0       0       0       0       0</span>
-<span class="co">#&gt; 36      0      0      0      0      0       0       0       0       0       0</span>
-<span class="co">#&gt; 42      0      0      0      0      0       0       0       0       0       0</span>
-<span class="co">#&gt; 48      0      0      0      0      0       0       0       0       0       0</span>
+<span class="co">#&gt; $block_1</span>
+<span class="co">#&gt;         RT_in_min subitems MC CMC short_answer open diff_1 diff_2 diff_3 diff_4</span>
+<span class="co">#&gt; item_10       1.0        1 NA   0            1   NA      1      0      0      0</span>
+<span class="co">#&gt; item_22       2.5        1  1   0            0   NA      0      0      0      1</span>
+<span class="co">#&gt; item_40       1.0        1 NA   0            1   NA      0      0      1      0</span>
+<span class="co">#&gt; item_46       2.5        2 NA   0            2   NA      0      1      1      0</span>
+<span class="co">#&gt; item_63       1.5        1  1   0            0   NA      0      0      1      0</span>
+<span class="co">#&gt; Sum           8.5        6 NA   0            4   NA      1      1      3      1</span>
+<span class="co">#&gt;         diff_5</span>
+<span class="co">#&gt; item_10      0</span>
+<span class="co">#&gt; item_22      0</span>
+<span class="co">#&gt; item_40      0</span>
+<span class="co">#&gt; item_46      0</span>
+<span class="co">#&gt; item_63      0</span>
+<span class="co">#&gt; Sum          0</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; [[2]]</span>
-<span class="co">#&gt;    Item_ID                exclusions RT_in_min subitems MC CMC short_answer</span>
-<span class="co">#&gt; 2  item_01          item_00, item_06       1.5        1 NA   0            1</span>
-<span class="co">#&gt; 19 item_18          item_48, item_56       2.0        1  1   0            0</span>
-<span class="co">#&gt; 20 item_19                   item_76       1.5        1 NA   0            1</span>
-<span class="co">#&gt; 60 item_59 item_53, item_43, item_29       1.5        1 NA   0            1</span>
-<span class="co">#&gt; 62 item_61                   item_60       3.0        1 NA   0            0</span>
-<span class="co">#&gt;    open diff_1 diff_2 diff_3 diff_4 diff_5 MC_open_none  f_CMC form_1 form_2</span>
-<span class="co">#&gt; 2    NA      0      1      0      0      0       _none_ CMC_no      0      1</span>
-<span class="co">#&gt; 19   NA      0      0      0      1      0           MC CMC_no      0      1</span>
-<span class="co">#&gt; 20   NA      0      0      1      0      0       _none_ CMC_no      0      1</span>
-<span class="co">#&gt; 60   NA      0      1      0      0      0       _none_ CMC_no      0      1</span>
-<span class="co">#&gt; 62    1      0      0      1      0      0         open CMC_no      0      1</span>
-<span class="co">#&gt;    form_3 form_4 form_5 form_6 form_7 form_8 form_9 form_10 form_11 form_12</span>
-<span class="co">#&gt; 2       0      0      0      0      0      0      0       0       0       0</span>
-<span class="co">#&gt; 19      0      0      0      0      0      0      0       0       0       0</span>
-<span class="co">#&gt; 20      0      0      0      0      0      0      0       0       0       0</span>
-<span class="co">#&gt; 60      0      0      0      0      0      0      0       0       0       0</span>
-<span class="co">#&gt; 62      0      0      0      0      0      0      0       0       0       0</span>
-<span class="co">#&gt;    form_13 form_14</span>
-<span class="co">#&gt; 2        0       0</span>
-<span class="co">#&gt; 19       0       0</span>
-<span class="co">#&gt; 20       0       0</span>
-<span class="co">#&gt; 60       0       0</span>
-<span class="co">#&gt; 62       0       0</span></code></pre></div>
+<span class="co">#&gt; $block_2</span>
+<span class="co">#&gt;         RT_in_min subitems MC CMC short_answer open diff_1 diff_2 diff_3 diff_4</span>
+<span class="co">#&gt; item_00       1.0        1 NA   0            1   NA      1      0      0      0</span>
+<span class="co">#&gt; item_07       2.5        1 NA   0            1   NA      0      0      0      1</span>
+<span class="co">#&gt; item_15       1.0        1  1   0            0   NA      1      0      0      0</span>
+<span class="co">#&gt; item_37       2.5        1 NA   0            1   NA      0      0      1      0</span>
+<span class="co">#&gt; item_43       1.5        1 NA   0            1   NA      0      1      0      0</span>
+<span class="co">#&gt; item_61       3.0        1 NA   0            0    1      0      0      1      0</span>
+<span class="co">#&gt; Sum          11.5        6 NA   0            4   NA      2      1      2      1</span>
+<span class="co">#&gt;         diff_5</span>
+<span class="co">#&gt; item_00      0</span>
+<span class="co">#&gt; item_07      0</span>
+<span class="co">#&gt; item_15      0</span>
+<span class="co">#&gt; item_37      0</span>
+<span class="co">#&gt; item_43      0</span>
+<span class="co">#&gt; item_61      0</span>
+<span class="co">#&gt; Sum          0</span></code></pre></div>
 <p>In this case I also want to assemble the created booklets into test forms. Therefore, I am interested in booklet exclusions that can result from item exclusions. The <code>analyzeBlockExclusion()</code> function can be used to obtain tuples with booklet exclusions.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">analyzeBlockExclusion</span>(<span class="dt">processedObj =</span> out_list, <span class="dt">idCol =</span> <span class="st">&quot;Item_ID&quot;</span>, <span class="dt">exclusionTuples =</span> exclusionTuples)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">analyzeBlockExclusion</span>(<span class="dt">solverOut =</span> solver_raw, <span class="dt">item =</span> items, <span class="dt">idCol =</span> <span class="st">&quot;Item_ID&quot;</span>, 
+                      <span class="dt">exclusionTuples =</span> exclusionTuples)
 <span class="co">#&gt;      Name 1   Name 2</span>
-<span class="co">#&gt; 1   block 2  block 4</span>
-<span class="co">#&gt; 2   block 4  block 9</span>
-<span class="co">#&gt; 3   block 2  block 9</span>
-<span class="co">#&gt; 4   block 8  block 9</span>
-<span class="co">#&gt; 5  block 14  block 9</span>
-<span class="co">#&gt; 6   block 5  block 9</span>
-<span class="co">#&gt; 7  block 14  block 8</span>
-<span class="co">#&gt; 8   block 5  block 8</span>
-<span class="co">#&gt; 9  block 10  block 9</span>
-<span class="co">#&gt; 10 block 10  block 6</span>
-<span class="co">#&gt; 11 block 14  block 6</span>
-<span class="co">#&gt; 12  block 6  block 8</span>
-<span class="co">#&gt; 14 block 10  block 7</span>
-<span class="co">#&gt; 15 block 10 block 14</span>
-<span class="co">#&gt; 16 block 10  block 8</span>
-<span class="co">#&gt; 19  block 2  block 7</span>
-<span class="co">#&gt; 20  block 2  block 5</span>
-<span class="co">#&gt; 22  block 1  block 5</span>
-<span class="co">#&gt; 23 block 10 block 13</span>
-<span class="co">#&gt; 24  block 3  block 9</span>
-<span class="co">#&gt; 25  block 1 block 11</span>
-<span class="co">#&gt; 28  block 3  block 5</span>
-<span class="co">#&gt; 30 block 12  block 5</span>
-<span class="co">#&gt; 31  block 1 block 12</span>
-<span class="co">#&gt; 33 block 11  block 6</span>
-<span class="co">#&gt; 34  block 5  block 7</span>
-<span class="co">#&gt; 36 block 14  block 3</span>
-<span class="co">#&gt; 37 block 14  block 7</span>
-<span class="co">#&gt; 39  block 3  block 7</span>
-<span class="co">#&gt; 41 block 12  block 8</span>
-<span class="co">#&gt; 43  block 2  block 8</span>
-<span class="co">#&gt; 44 block 14  block 5</span>
-<span class="co">#&gt; 45 block 11  block 4</span></code></pre></div>
+<span class="co">#&gt; 1  block_12  block_2</span>
+<span class="co">#&gt; 2  block_14  block_2</span>
+<span class="co">#&gt; 3  block_12 block_14</span>
+<span class="co">#&gt; 4  block_12  block_9</span>
+<span class="co">#&gt; 5   block_1 block_12</span>
+<span class="co">#&gt; 6  block_12  block_7</span>
+<span class="co">#&gt; 7   block_1  block_9</span>
+<span class="co">#&gt; 8   block_7  block_9</span>
+<span class="co">#&gt; 9   block_2  block_8</span>
+<span class="co">#&gt; 10 block_10  block_7</span>
+<span class="co">#&gt; 11 block_10  block_4</span>
+<span class="co">#&gt; 12 block_10  block_6</span>
+<span class="co">#&gt; 13  block_1  block_3</span>
+<span class="co">#&gt; 14 block_11  block_4</span>
+<span class="co">#&gt; 15  block_4  block_7</span>
+<span class="co">#&gt; 16  block_6  block_7</span>
+<span class="co">#&gt; 17  block_4  block_6</span>
+<span class="co">#&gt; 18 block_10 block_11</span>
+<span class="co">#&gt; 19  block_4  block_9</span>
+<span class="co">#&gt; 20 block_10  block_9</span>
+<span class="co">#&gt; 21 block_10  block_5</span>
+<span class="co">#&gt; 22  block_6  block_8</span>
+<span class="co">#&gt; 24 block_13  block_4</span>
+<span class="co">#&gt; 25 block_12  block_6</span>
+<span class="co">#&gt; 27  block_3  block_8</span>
+<span class="co">#&gt; 28 block_11  block_5</span>
+<span class="co">#&gt; 29 block_11  block_7</span>
+<span class="co">#&gt; 30  block_2  block_6</span>
+<span class="co">#&gt; 32  block_3  block_7</span>
+<span class="co">#&gt; 33 block_14  block_5</span>
+<span class="co">#&gt; 34 block_13  block_2</span>
+<span class="co">#&gt; 39  block_1  block_4</span>
+<span class="co">#&gt; 41  block_7  block_8</span>
+<span class="co">#&gt; 42 block_13  block_8</span>
+<span class="co">#&gt; 43  block_2  block_7</span>
+<span class="co">#&gt; 44  block_1  block_7</span>
+<span class="co">#&gt; 45 block_14  block_3</span></code></pre></div>
 </div>
 <div id="save-as-excel" class="section level2">
 <h2>Save as Excel</h2>
-<p>Finally, when the solution should be exported as an <code>excel</code> file (<code>.xlsx</code>), This can, for example, be achieved via the <code>eatAnalysis</code> package, which has to be installed from <code>Github</code>.</p>
+<p>To save the item distribution on blocks or test forms, we can use the <code>appendSolution()</code> function. The function simply merges the new variables containing the solution to the test assembly problem to the original item pool.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out_df &lt;-<span class="st"> </span><span class="kw">appendSolution</span>(solver_raw, <span class="dt">items =</span> items, <span class="dt">idCol =</span> <span class="st">&quot;Item_ID&quot;</span>)</code></pre></div>
+<p>Finally, when the solution should be exported as an <code>excel</code> file (<code>.xlsx</code>), this can, for example, be achieved via the <code>eatAnalysis</code> package, which has to be installed from <code>Github</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;beckerbenj/eatAnalysis&quot;</span>)
-out_df &lt;-<span class="st"> </span><span class="kw">processGurobiOutput</span>(solver_raw, <span class="dt">items =</span> items, <span class="dt">nForms =</span> nForms, <span class="dt">output =</span> <span class="st">&quot;data.frame&quot;</span>)
 
 eatAnalysis<span class="op">::</span><span class="kw">write_xlsx</span>(out_df, <span class="dt">filePath =</span> <span class="st">&quot;example_excel.xlsx&quot;</span>,
                         <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</code></pre></div>

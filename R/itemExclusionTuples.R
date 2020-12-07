@@ -5,7 +5,8 @@
 #'
 #' If item exclusions are stored as a character vector, \code{itemExclusionTuples} separates this vector and creates item pairs ('tuples').
 #'
-#' Exclusion tuples can be used by \code{\link{itemExclusionConstraint}} to set up exclusion constraints.
+#' Exclusion tuples can be used by \code{\link{itemExclusionConstraint}} to set up exclusion constraints. Note that a
+#' separator pattern has to be used consistently throughout the column (e.g. \code{", "}).
 #'
 #'@param items A \code{data.frame} with information on an item pool.
 #'@param idCol Name of the item ID column.
@@ -48,11 +49,27 @@ itemExclusionTuples <- function(items, idCol = "ID", exclusions, sepPattern = ",
 
   out_list <- apply(excl_df, 1, function(excl_row) {
     do.call(rbind, lapply(excl_row[c(FALSE, !is.na(excl_row[2:(max_excl+1)]))], function(x) {
-      sort(c(excl_row[idCol], x))
+      sort(as.character(c(excl_row[idCol], x)))
     }))
   })
 
   out_excl_df <- do.call(rbind, out_list)
   rownames(out_excl_df) <- NULL
-  unique(out_excl_df)
+  out_excl_df2 <- unique(out_excl_df)
+
+  #browser()
+  apply(out_excl_df2, 1, function(excl_row) {
+    if(excl_row[1] == excl_row[2]) stop("The following item is excluded from being with itself: ", excl_row[1])
+  })
+  check_item_identifiers(new_idents = unique(unlist(out_excl_df2)), ident_col = items[, idCol])
+
+  out_excl_df2
+}
+
+# test for invalid item identifiers
+check_item_identifiers <- function(new_idents, ident_col) {
+  idents_not_in_idents <- new_idents[!new_idents %in% ident_col]
+  idents_not_in_idents_string <- paste(idents_not_in_idents, collapse = "', '")
+  if(length(idents_not_in_idents) > 0) warning("The following item identifiers in the exclusion column are not item identifiers in the idCol column (check for correct sepPattern!): ", paste0("'", idents_not_in_idents_string, "'"))
+  return()
 }

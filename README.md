@@ -1,4 +1,5 @@
 <!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/eatATA)](https://CRAN.R-project.org/package=eatATA)
 [![Travis build status](https://travis-ci.org/beckerbenj/eatATA.svg?branch=master)](https://travis-ci.org/beckerbenj/eatATA)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/beckerbenj/eatATA?branch=master&svg=true)](https://ci.appveyor.com/project/beckerbenj/eatATA)
 [![Codecov test coverage](https://codecov.io/gh/beckerbenj/eatATA/branch/master/graph/badge.svg)](https://codecov.io/gh/beckerbenj/eatATA?branch=master)
@@ -9,16 +10,23 @@
 
 ## Overview
 
-`eatATA` provides a small `R` interface to mathematical optimization solvers specialized on solving simple automated test assembly problems (*ATA*). Internally, sparse matrices are used via the `Matrix` package. Currently the only supported solver  is `Gurobi`. See below for a list of implemented features and feature to come.
+`eatATA` provides a small `R` interface to mathematical optimization solvers specialized on solving simple automated test assembly problems (`ATA`). Internally, sparse matrices are used via the `Matrix` package. Currently supported solvers are `GLPK`, `lpSolve`, and `Gurobi`. See below for a list of implemented features and feature to come.
 
 ## Installation
 
 ```R
-# Install eatATA from GitHub via
-devtools::install_github("beckerbenj/eatATA", build_vignettes = TRUE)
+# Install eatATA from CRAN via
+install.packages("eatATA")
+
+# Install development version from GitHub via
+remotes::install_github("beckerbenj/eatATA", build_vignettes = TRUE)
 ```
 
 ## Documentation
+
+A vignette describing the current functionality can be found on [CRAN](https://CRAN.R-project.org/package=eatATA/vignettes/eatATA.html).
+
+Alternatively, the vignette of the development version can be accessed through `R`. 
 
 ```R
 library(eatATA)
@@ -41,7 +49,7 @@ The following types of constraints can be set via `eatATA`:
 
 ## Outlook
 
-We are hoping to build interfaces to other mathematical optimization solvers. The current interface to `Gurobi` is the function `prepareConstraints()`. 
+We are hoping to add interfaces to other mathematical optimization solvers. 
 
 Constraints that we hope to implement in the future:
 
