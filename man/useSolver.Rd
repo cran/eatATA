@@ -6,36 +6,29 @@
 \usage{
 useSolver(
   allConstraints,
-  nForms,
-  itemIDs,
-  solver = c("GLPK", "lpSolve", "Gurobi"),
+  solver = c("GLPK", "lpSolve", "Gurobi", "Symphony"),
   timeLimit = Inf,
-  modelSense = c("min", "max"),
+  formNames = NULL,
   ...
 )
 }
 \arguments{
 \item{allConstraints}{List of constraints.}
 
-\item{nForms}{Number of forms to be created.}
-
-\item{itemIDs}{Character vector of item IDs.}
-
 \item{solver}{A character string indicating the solver to use.}
 
 \item{timeLimit}{The maximal runtime in seconds.}
 
-\item{modelSense}{A character string indicating whether to minimize or
-maximize the objective function.}
+\item{formNames}{A character vector with names to give to the forms.}
 
 \item{...}{Additional arguments for the solver.}
 }
 \value{
 A list with the following elements:
 \describe{
-  \item{\code{solution}}{The object returned by the solver.}
-  \item{\code{solver_function}}{The solver function that was called, and can be called with the \code{objects_for_solver}.}
-  \item{\code{objects_for_solver}}{A list with the objects that are used in the call.}
+  \item{\code{solution_found}}{Was a solution found?}
+  \item{\code{solution}}{Numeric vector containing the found solution.}
+  \item{\code{solution_status}}{Was the solution optimal?}
 }
 }
 \description{
@@ -56,15 +49,15 @@ nForms <- 2
 nItems <- 4
 
 # create constraits
-target <- itemTargetConstraint(nForms = nForms, nItems = nItems,
-  c(1, 0.5, 1.5, 2), targetValue = 2)
-noItemOverlap <- itemUsageConstraint(nForms, nItems = nItems, operator = "=")
-testLength <- itemsPerFormConstraint(nForms = nForms, nItems = nItems,
-  operator = "<=", 2)
+target <- minimaxConstraint(nForms = nForms, c(1, 0.5, 1.5, 2),
+                       targetValue = 2, itemIDs = 1:nItems)
+noItemOverlap <- itemUsageConstraint(nForms, operator = "=", itemIDs = 1:nItems)
+testLength <- itemsPerFormConstraint(nForms = nForms,
+                           operator = "<=", targetValue = 2, itemIDs = 1:nItems)
 
 # use a solver
 result <- useSolver(list(target, noItemOverlap, testLength),
-  nForms = nForms, itemIDs = paste0("Item_", 1:4),
+  itemIDs = paste0("Item_", 1:4),
   solver = "GLPK")
 
 

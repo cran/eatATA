@@ -7,15 +7,14 @@ exclusionTuples <- data.frame(v1 = c("item1", "item3"),
                               v2 = c("item2", "item4"), stringsAsFactors = FALSE)
 exclusionTuples_mat <- as.matrix(exclusionTuples)
 excl <- itemExclusionConstraint(nForms = 3, exclusionTuples, itemIDs = items_small$ID)
-usage <- itemUsageConstraint(nForms = 3, nItems = 6, operator = "=", targetValue = 1)
-perForm <- itemsPerFormConstraint(nForms = 3, nItems = 6, operator = "=", targetValue = 2)
+usage <- itemUsageConstraint(nForms = 3, nItems = 6, operator = "=", targetValue = 1, itemIDs = items_small$ID)
+perForm <- itemsPerFormConstraint(nForms = 3, nItems = 6, operator = "=", targetValue = 2, itemIDs = items_small$ID)
 
-target <- itemTargetConstraint(nForms = 3, nItems = 6,
-                               itemValues = items_small$itemValues,
-                               targetValue = 0)
+target <- minimaxConstraint(nForms = 3, itemValues = items_small$itemValues,
+                               targetValue = 0, itemIDs = items_small$ID)
 
 suppressMessages(sol <- useSolver(allConstraints = list(usage, excl, target, perForm),
-                                  nForms = 3, itemIDs = items_small$ID, solver = "GLPK", verbose = FALSE))
+                                  solver = "GLPK", verbose = FALSE, formNames = "block"))
 #save(sol, file = "tests/testthat/helper_BlockExclusions.RData")
 #load("tests/testthat/helper_BlockExclusions.RData")
 load("helper_BlockExclusions.RData")
@@ -52,11 +51,15 @@ test_that("analyze block exclusions errors", {
   expect_error(analyzeBlockExclusion(sol, items = as.list(items_small), idCol = "ID", exclusionTuples),
                "'items' must be a data.frame.")
   expect_error(analyzeBlockExclusion(sol, items = items_small, idCol = "lala", exclusionTuples),
-               "'idCol' must be a column name in 'items'.")
+               "'idCol' is not a column in 'items'.")
   expect_error(analyzeBlockExclusion(sol, items = items_small, idCol = "ID", exclusionTuples[, c(1, 1, 2)]),
                "'exclusionTuples' must have two columns.")
   expect_error(analyzeBlockExclusion(sol, items = items_small, idCol = "ID", exclusionTuples = "a"),
                "'exclusionTuples' must be a data.frame.")
+  sol$solution_found <- FALSE
+  sol$solution <- rep(0, length(sol$solution))
+  expect_error(analyzeBlockExclusion(sol, items = items_small, idCol = "ID", exclusionTuples),
+               "'solverOut' does not contain a feasible solution.")
 })
 
 test_that("block exclusions without item pool depletion", {

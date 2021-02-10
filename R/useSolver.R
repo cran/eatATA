@@ -14,19 +14,16 @@
 #' time limits can not be set for \code{lpSolve}.
 #'
 #'@param allConstraints List of constraints.
-#'@param nForms Number of forms to be created.
-#'@param itemIDs Character vector of item IDs.
 #'@param solver A character string indicating the solver to use.
 #'@param timeLimit The maximal runtime in seconds.
-#'@param modelSense A character string indicating whether to minimize or
-#'  maximize the objective function.
+#'@param formNames A character vector with names to give to the forms.
 #'@param ... Additional arguments for the solver.
 #'
 #'@return A list with the following elements:
 #'\describe{
-#'   \item{\code{solution}}{The object returned by the solver.}
-#'   \item{\code{solver_function}}{The solver function that was called, and can be called with the \code{objects_for_solver}.}
-#'   \item{\code{objects_for_solver}}{A list with the objects that are used in the call.}
+#'   \item{\code{solution_found}}{Was a solution found?}
+#'   \item{\code{solution}}{Numeric vector containing the found solution.}
+#'   \item{\code{solution_status}}{Was the solution optimal?}
 #' }
 #'
 #'
@@ -35,64 +32,51 @@
 #' nItems <- 4
 #'
 #' # create constraits
-#' target <- itemTargetConstraint(nForms = nForms, nItems = nItems,
-#'   c(1, 0.5, 1.5, 2), targetValue = 2)
-#' noItemOverlap <- itemUsageConstraint(nForms, nItems = nItems, operator = "=")
-#' testLength <- itemsPerFormConstraint(nForms = nForms, nItems = nItems,
-#'   operator = "<=", 2)
+#' target <- minimaxConstraint(nForms = nForms, c(1, 0.5, 1.5, 2),
+#'                        targetValue = 2, itemIDs = 1:nItems)
+#' noItemOverlap <- itemUsageConstraint(nForms, operator = "=", itemIDs = 1:nItems)
+#' testLength <- itemsPerFormConstraint(nForms = nForms,
+#'                            operator = "<=", targetValue = 2, itemIDs = 1:nItems)
 #'
 #' # use a solver
 #' result <- useSolver(list(target, noItemOverlap, testLength),
-#'   nForms = nForms, itemIDs = paste0("Item_", 1:4),
+#'   itemIDs = paste0("Item_", 1:4),
 #'   solver = "GLPK")
 #'
 #'
 #'
 #'@export
-useSolver <- function(allConstraints, nForms, itemIDs,
-                      solver = c("GLPK", "lpSolve", "Gurobi"),
+useSolver <- function(allConstraints,
+                      solver = c("GLPK", "lpSolve", "Gurobi", "Symphony"),
                       timeLimit = Inf,
-                      modelSense = c("min", "max"),
+                      formNames = NULL,
                       ...){
 
   # make sure solver is correct
   solver <- match.arg(solver)
-  modelSense <- match.arg(modelSense)
-
-  # check inputs
-  check_single_numeric(nForms)
-  if(!is.character(itemIDs) && !is.numeric(itemIDs)) stop("'itemIDs' needs to be a numeric or character vector.")
-  if(!is.character(solver) || length(solver) != 1 || !solver %in% c("GLPK", "lpSolve", "Gurobi")) stop("'solver' needs to be exactly one of 'GLPK', 'lpSolve', or 'Gurobi'.")
-
-  # check constraints
-  if(!is.list(allConstraints)) stop("allConstraints needs to be a list.")
-  if(!all(sapply(allConstraints, function(x) "dgCMatrix" %in% class(x)))) stop("All elements in allConstraints need to be matrices.")
 
   # combine all constraints
-  Ad <- do.call(rbind, allConstraints)
+  allConstraints <- combineConstraints(allConstraints, message = FALSE)
 
-  # get values for MILP
-  nItems <- length(itemIDs)
-  nBin <- nItems*nForms         # number of binary MILP variables
-  nVar <- nBin + 1              # number of MILP variables
-  A <- as.matrix(Ad[ , 1:nVar])     # matrix with left-hand side of constraints
-  d <- as.vector(Ad[ ,(nVar + 2)])  # vector with right-hand side of constraints
-  c <- c(rep(0, nBin), 1)       # vector with the weights of the constraints
+  # extract info
+  nItems <- attr(allConstraints, "nItems")
+  nForms <- attr(allConstraints, "nForms")
+  nBin <- nItems * nForms
 
-
-  # directions for the constraints
-  direction <- as.vector(Ad[ ,(nVar + 1)])
-  direction[which(direction==-1)] <- "<="
-  direction[which(direction==0)] <- "="
-  direction[which(direction==1)] <- ">="
+  # check form names
+  if(is.null(formNames)) formNames <- "form"
+  if(length(formNames) == 1) formNames <- paste0(formNames, "_", seq_len(nForms))
+  if(length(formNames) != nForms) stop("'formNames' should be a character string of length 1 or of length 'nForms'.")
 
   # call wrappers around solver
   if(solver == "GLPK") {
-    out <- useGLPK(A, direction, d, c, modelSense, nBin, nVar, timeLimit, ...)
+    out <- useGLPK(allConstraints, nBin, timeLimit, ...)
   } else if(solver == "lpSolve") {
-    out <- useLpSolve(A, direction, d, c, modelSense, nBin, nVar, timeLimit, ...)
+    out <- useLpSolve(allConstraints, nBin, timeLimit, ...)
   } else if(solver == "Gurobi") {
-    out <- useGurobi(A, direction, d, c, modelSense, nBin, nVar, timeLimit, ...)
+    out <- useGurobi(allConstraints, nBin, timeLimit, ...)
+  } else if(solver == "Symphony") {
+    out <- useSymphony(allConstraints, nBin, timeLimit, ...)
   }
   if(out$solution_found) message("Optimal solution found.")
   else message('if'(is.null(out$solution_status),
@@ -104,35 +88,40 @@ useSolver <- function(allConstraints, nForms, itemIDs,
     ind <- (formNr - 1)*nItems + 1:nItems
     out$solution[ind]
   }))
-  names(out$item_matrix) <- paste0("block_", seq(nForms))
-  rownames(out$item_matrix) <- itemIDs
+
+  names(out$item_matrix) <- formNames
+  rownames(out$item_matrix) <- attr(allConstraints, "itemIDs")
   #out[["nForms"]] <- nForms
   out
 }
 
 
 ### wrapper around Rglpk::Rglpk_solve_LP()  ------------------------------------
-useGLPK <- function(A, direction, d, c, modelSense, nBin, nVar,
+useGLPK <- function(allConstraints, nBin,
                     timeLimit, bounds = NULL, ...){
 
   # handle dots, make list
   dots <- as.list(substitute(...()))
 
   # Rglpk uses "==" rather then "="
-  direction[direction == "="] <- "=="
+  allConstraints$operators[allConstraints$operators == "="] <- "=="
 
   # create solver function
   solver_function <- Rglpk::Rglpk_solve_LP
 
   # create list with all the objects for Rglpk::Rglpk_solve_LP()
   objects_for_solver <- c(list(
-    obj = c,
-    mat = A,
-    dir = direction,
-    rhs = d,
+    obj = c('if'(is.null(allConstraints$c_binary),
+                 rep(0, nBin),
+                 allConstraints$c_binary),
+            allConstraints$c_real),
+    mat = cbind(allConstraints$A_binary, allConstraints$A_real),
+    dir = allConstraints$operators,
+    rhs = allConstraints$d,
     bounds = bounds,
-    types = c(rep("B", nBin), "C"),
-    max = modelSense == "max",
+    types = c(rep("B", nBin), 'if'(is.null(allConstraints$c_real),
+                                   NULL, rep("C", length(allConstraints$c_real)))),
+    max = 'if'(is.null(attr(allConstraints, "sense")), FALSE, attr(allConstraints, "sense") == "max"),
     # Avoid warning when timeLimit == Inf
     control = list(
       canonicalize_status = FALSE,
@@ -158,7 +147,7 @@ useGLPK <- function(A, direction, d, c, modelSense, nBin, nVar,
 
 
 ### wrapper around lpSolve::lp() -----------------------------------------------
-useLpSolve <- function(A, direction, d, c, modelSense, nBin, nVar,
+useLpSolve <- function(allConstraints, nBin,
                        timeLimit, ...){
 
   # handle dots, make list
@@ -169,12 +158,15 @@ useLpSolve <- function(A, direction, d, c, modelSense, nBin, nVar,
 
     # create list with all the objects for lpSolve::lp()
   objects_for_solver <- c(list(
-      direction = modelSense,
-      objective.in = c,
-      const.mat = A,
+      direction = 'if'(is.null(attr(allConstraints, "sense")), "min", attr(allConstraints, "sense")),
+      objective.in = c('if'(is.null(allConstraints$c_binary),
+                            rep(0, nBin),
+                            allConstraints$c_binary),
+                       allConstraints$c_real),
+      const.mat = as.matrix(cbind(allConstraints$A_binary, allConstraints$A_real)),
       transpose.constraints = TRUE,
-      const.dir = direction,
-      const.rhs = d,
+      const.dir = allConstraints$operators,
+      const.rhs = allConstraints$d,
       int.vec = seq_len(nBin),
       binary.vec = seq_len(nBin)),
     dots)
@@ -207,7 +199,7 @@ useLpSolve <- function(A, direction, d, c, modelSense, nBin, nVar,
 
 
 ### wrapper around gurobi::gurobi() --------------------------------------------
-useGurobi <- function(A, direction, d, c, modelSense, nBin, nVar,
+useGurobi <- function(allConstraints, nBin,
                       timeLimit, ...){
 
   # handle dots, make list
@@ -218,14 +210,18 @@ useGurobi <- function(A, direction, d, c, modelSense, nBin, nVar,
 
   if(timeLimit == Inf) timeLimit <- 9999
 
-  # create list with all the objects for Rglpk::Rglpk_solve_LP()
+  # create list with all the objects for gurobi::gurobi()
   objects_for_solver <- list(model = c(
-      list(A = A,
-           rhs = d,
-           sense = direction,
-           obj = c,
-           modelsense = modelSense,
-           vtype = c(rep("B", nBin), "C")),
+      list(A = as.matrix(cbind(allConstraints$A_binary, allConstraints$A_real)),
+           rhs = allConstraints$d,
+           sense = allConstraints$operators,
+           obj = c('if'(is.null(allConstraints$c_binary),
+                        rep(0, nBin),
+                        allConstraints$c_binary),
+                   allConstraints$c_real),
+           modelsense = attr(allConstraints, "sense"),
+           vtype = c(rep("B", nBin), 'if'(is.null(allConstraints$c_real),
+                                          NULL, rep("C", length(allConstraints$c_real))))),
       dots),
     params = c(TimeLimit = timeLimit, dots))
 
@@ -237,10 +233,51 @@ useGurobi <- function(A, direction, d, c, modelSense, nBin, nVar,
 
   # object to return
   list(solution_found = gurobi_out$status %in% c("OPTIMAL"),
-       solution = gurobi_out$x)
+       solution = gurobi_out$x,
+       solution_status = gurobi_out$status)
 
 }
 
+
+### wrapper around Rsymphony::Rsymphony_solve_LP() --------------------------------------------
+useSymphony <- function(allConstraints, nBin,
+                        timeLimit, bounds = NULL, ...){
+
+  # handle dots, make list
+  dots <- as.list(substitute(...()))
+
+  # Symphony uses "==" rather then "="
+  allConstraints$operators[allConstraints$operators == "="] <- "=="
+
+  if(timeLimit == Inf) timeLimit <- -1
+
+  # create solver function
+  solver_function <- Rsymphony::Rsymphony_solve_LP
+
+  # create list with all the objects for Rsymphony::Rsymphony_solve_LP()
+  objects_for_solver <- c(list(
+    obj = c('if'(is.null(allConstraints$c_binary),
+                 rep(0, nBin),
+                 allConstraints$c_binary),
+            allConstraints$c_real),
+    mat = cbind(allConstraints$A_binary, allConstraints$A_real),
+    dir = allConstraints$operators,
+    rhs = allConstraints$d,
+    bounds = bounds,
+    types = c(rep("B", nBin), 'if'(is.null(allConstraints$c_real),
+                                   NULL, rep("C", length(allConstraints$c_real)))),
+    max = attr(allConstraints, "sense") == "max",
+    time_limit = timeLimit,
+    verbosity = -2))
+
+  # compute solution
+  symphony_out <- do.call(solver_function, objects_for_solver)
+
+  # object to return
+  list(solution_found = symphony_out$status == 0,
+       solution = symphony_out$solution,
+       solution_status = "not yet researched, tbd")
+}
 
 # function that evaluates a call with a time limit
 eval_call_with_time_limit <- function(

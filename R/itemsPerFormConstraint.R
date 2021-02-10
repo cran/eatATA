@@ -9,29 +9,34 @@
 #' (\code{operator = "="}), or (c) greater or equal than
 #' (\code{operator = ">="}) the chosen \code{value}.
 #'
-#'@param nForms Number of forms to be created.
-#'@param nItems Number of items in the item pool.
-#'@param operator a character indicating which operator should be used in the
-#'  constraints, with three possible values: \code{"<="}, \code{"="},
-#'  or \code{">="}. See details for more information.
+#'@inheritParams itemValuesConstraint
+#'@inheritParams itemUsageConstraint
 #'@param targetValue The target value to be used in the constraints. That is,
 #'  the number of items per form.
 #'
-#'@return A sparse matrix.
+#'@return An object of class \code{"constraint"}.
 #'
 #'
 #'@examples
 #' ## Constrain the test forms to have exactly five items
-#' itemsPerFormConstraint(3, 20, operator = "=", targetValue = 5)
+#' itemsPerFormConstraint(3, operator = "=", targetValue = 5,
+#'                        itemIDs = 1:20)
 #'
 #'@export
-itemsPerFormConstraint <- function(nForms, nItems, operator = c("<=", "=", ">="), targetValue){
+itemsPerFormConstraint <- function(nForms, nItems = NULL, operator = c("<=", "=", ">="),
+                                   targetValue, whichForms = seq_len(nForms),
+                                   itemIDs = NULL){
 
   operator <- match.arg(operator)
+  suppressWarnings(nItems <- comb_itemIDs_nItems(itemIDs, nItems))
 
   # value cannot be greater than nForms
   if(targetValue > nItems) stop("'targetValue' should be smaller than or equal to 'nItems'.")
 
-  itemValuesConstraint(nForms, nItems, itemValues = rep(1, nItems), operator, targetValue)
+
+  itemValuesConstraint(nForms, itemValues = rep(1, nItems), operator,
+                       targetValue, whichForms = whichForms,
+                       info_text = paste0("itemsPerForm", operator, targetValue),
+                       itemIDs)
 
 }

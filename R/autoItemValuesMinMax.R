@@ -2,12 +2,14 @@
 #'
 #' \code{\link{itemValuesDeviation}} creates constraints related to an item parameter/value. \code{autoItemValuesMixMax} automatically
 #' determines the appropriate \code{targetValue} and then calls \code{\link{itemValuesDeviation}}. The function only works for
-#' (dichotomous) dummy indicators with values 0 and 1.
+#' (dichotomous) dummy indicators with values 0 or 1.
 #'
-#' Two scenarios are possible when automatically determining the target value: (a) Either items with the selected property could be exactly
+#' Two scenarios are possible when automatically determining the target value:
+#' (a) Either items with the selected property could be exactly
 #' distributed across test forms or (b) this is not possible. An example would be 2 test forms and 4 multiple choice items (a) or 2 test
 #' forms and 5 multiple choice items (b). If (a), the tolerance level works exactly as one would expect. If (b) the tolerance level is
-#' adapted, meaning that if tolerance level is 0 in example (b), allowed values are 2 or 3 multiple choice items per test form.
+#' adapted, meaning that if tolerance level is 0 in example (b), allowed values are 2 or 3 multiple choice items per test form. For detailed documentation on how the minimum and maximum are calculated
+#' see also \code{\link{computeTargetValues}}.
 #'
 #' @inheritParams itemValuesConstraint
 #' @inheritParams computeTargetValues
@@ -19,23 +21,20 @@
 #' autoItemValuesMinMax(2, itemValues = c(0, 1, 0, 1))
 #'
 #' @export
-autoItemValuesMinMax <- function(nForms, itemValues, allowedDeviation = NULL,
-                                 relative = FALSE, verbose = TRUE){
-
+autoItemValuesMinMax <- function(nForms, itemValues, testLength = NULL, allowedDeviation = NULL,
+                                 relative = FALSE, verbose = TRUE, itemIDs = NULL){
+  check_itemIDs(itemIDs)
   # compute the minimum and maximum values
-  min_max <- computeTargetValues(itemValues, nForms, testLength = NULL,
+  min_max <- computeTargetValues(itemValues, nForms, testLength = testLength,
                                  allowedDeviation = allowedDeviation, relative = relative)
   min_max <- round(min_max, 2)
   if(min_max[1] < 0) min_max[1] <- 0
 
-  # compute the number of items
-  nItems <- length(itemValues)
-
 
   # if itemValues are actually categories (i.e., a factor)
   if(is.factor(itemValues)){
-    out <- itemCategoryRange(nForms, nItems, itemCategories = itemValues,
-                       range = min_max)
+    out <- itemCategoryRange(nForms, itemCategories = itemValues,
+                       range = min_max, itemIDs = itemIDs)
 
     if(verbose){
       message("The minimum and maximum frequences per test form for each item category are")
@@ -46,15 +45,15 @@ autoItemValuesMinMax <- function(nForms, itemValues, allowedDeviation = NULL,
     if(is.null(allowedDeviation)){  # no minimum or maximum, but only a target value is used
                                     # thus equality constraints are used rather than
                                     # inequality constraints
-      out <- itemValuesConstraint(nForms, nItems, itemValues,
-                           operator = "=", targetValue = min_max)
+      out <- itemValuesConstraint(nForms, itemValues,
+                           operator = "=", targetValue = min_max, itemIDs = itemIDs)
       if(verbose){
         message("The target value per test form is: ", min_max)
         }
 
     } else {  # constraints with respect to a minimum and maximum
-      out <- itemValuesRange(nForms, nItems, itemValues,
-                       range = min_max)
+      out <- itemValuesRange(nForms, itemValues,
+                       range = min_max, itemIDs = itemIDs)
       if(verbose){
         message("The minimum and maximum values per test form are: min = ",
                 paste(min_max, collapse = " - max = "))
