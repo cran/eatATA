@@ -12,7 +12,7 @@
 
 <meta name="author" content="Benjamin Becker" />
 
-<meta name="date" content="2021-02-04" />
+<meta name="date" content="2021-04-16" />
 
 <title>Overview of eatATA Functionality</title>
 
@@ -28,11 +28,19 @@
     </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -133,7 +141,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">Overview of <code>eatATA</code> Functionality</h1>
 <h4 class="author">Benjamin Becker</h4>
-<h4 class="date">2021-02-04</h4>
+<h4 class="date">2021-04-16</h4>
 
 
 
@@ -149,16 +157,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="item-pool-preparation" class="section level2">
 <h2>Item pool preparation</h2>
 <p><code>eatATA</code> provides functions to calculate item information function (<code>calculateIIF()</code>) and expected response times (<code>calculatExpectedRT()</code>). <code>dummiesToFactor()</code> allows the transformation of a variable coded as multiple dummy variables into a single factor. <code>itemExclusionTuples()</code> allows the transformation of item exclusions saved as a single character variable into item exclusion tuples (pairs).</p>
+<p>There also a number of example item pools included in the package: * <code>items_mini</code>: A small minimal example item pool * <code>items_diao</code>: An item pool modeled after the first problem in Diao &amp; van der Linden (2011) * <code>items_pilot</code>: An item pool for a calibration study * <code>items_lsa</code>: An item pool for the block assembly of a large-scale assessment * <code>items_vera</code>: An item pool similar to a <code>Vergleichsarbeiten</code> item pool</p>
 </div>
 <div id="objective-function" class="section level2">
 <h2>Objective function</h2>
 <p>Constraints defining the optimization goal of the automated test assembly:</p>
 <ul>
-<li><code>maxConstraint()</code></li>
-<li><code>minConstraint()</code></li>
-<li><code>maximinConstraint()</code></li>
-<li><code>minimaxConstraint()</code></li>
-<li><code>cappedMaximinConstraint()</code></li>
+<li><code>maxObjective()</code></li>
+<li><code>minObjective()</code></li>
+<li><code>maximinObjective()</code></li>
+<li><code>minimaxObjective()</code></li>
+<li><code>cappedMaximinObjective()</code></li>
 </ul>
 </div>
 <div id="constraints" class="section level2">
@@ -176,19 +185,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Constraints controlling categorical properties of items across test forms:</p>
 <ul>
 <li><code>itemCategoryConstraint()</code></li>
-<li><code>itemCategoryDeviation()</code></li>
-<li><code>itemCategoryMax()</code></li>
-<li><code>itemCategoryMin()</code></li>
-<li><code>itemCategoryRange()</code></li>
+<li><code>itemCategoryDeviationConstraint()</code></li>
+<li><code>itemCategoryMaxConstraint()</code></li>
+<li><code>itemCategoryMinConstraint()</code></li>
+<li><code>itemCategoryRangeConstraint()</code></li>
 </ul>
 <p>Constraints controlling metric properties of items across test forms:</p>
 <ul>
 <li><code>autoItemValuesMinMax()</code></li>
 <li><code>itemValuesConstraint()</code></li>
-<li><code>itemValuesDeviation()</code></li>
-<li><code>itemValuesMax()</code></li>
-<li><code>itemValuesMin()</code></li>
-<li><code>itemValuesRange()</code></li>
+<li><code>itemValuesDeviationConstraint()</code></li>
+<li><code>itemValuesMaxConstraint()</code></li>
+<li><code>itemValuesMinConstraint()</code></li>
+<li><code>itemValuesRangeConstraint()</code></li>
 </ul>
 </div>
 <div id="solver-function" class="section level2">

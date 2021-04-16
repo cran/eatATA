@@ -12,7 +12,7 @@
 
 <meta name="author" content="Benjamin Becker" />
 
-<meta name="date" content="2021-02-04" />
+<meta name="date" content="2021-04-16" />
 
 <title>Typical Use of eatATA: a Minimal Example</title>
 
@@ -28,11 +28,19 @@
     </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -133,7 +141,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">Typical Use of <code>eatATA</code>: a Minimal Example</h1>
 <h4 class="author">Benjamin Becker</h4>
-<h4 class="date">2021-02-04</h4>
+<h4 class="date">2021-04-16</h4>
 
 
 
@@ -145,52 +153,102 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="item-pool" class="section level2">
 <h2>Item Pool</h2>
-<p>First, <code>eatATA</code> is loaded into your <code>R</code> session. In this vignette we use a small simulated item pool, <code>items_sim</code>. The goal will be to assemble a single test form consisting of ten items, an average test time of eight minutes and maximum <code>TIF</code> at medium ability. We therefore calculate the <code>IIF</code> at medium ability and append it to the item pool using the <code>calculateIFF()</code> function.</p>
+<p>First, <code>eatATA</code> is loaded into your <code>R</code> session. In this vignette we use a small simulated item pool, <code>items_mini</code>. The goal will be to assemble a single test form consisting of ten items, an average test time of eight minutes and maximum <code>TIF</code> at medium ability. We therefore calculate the <code>IIF</code> at medium ability and append it to the item pool using the <code>calculateIFF()</code> function.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># loading eatATA</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(eatATA)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># item pool structure</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(items_sim)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(items_mini)</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &#39;data.frame&#39;:    30 obs. of  4 variables:</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ id        : int  1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ item      : int  1 2 3 4 5 6 7 8 9 10 ...</span></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ format    : chr  &quot;mc&quot; &quot;mc&quot; &quot;mc&quot; &quot;mc&quot; ...</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ mean_time : num  29.5 25 31 37.6 27.3 ...</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ difficulty: num  0.0302 -0.5803 1.7906 -0.4644 -0.5265 ...</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ time      : num  27.8 15.5 31 29.9 23.1 ...</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ difficulty: num  -1.881 0.843 1.119 0.729 -0.489 ...</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate and append IIF</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>items_sim[, <span class="st">&quot;IIF&quot;</span>] <span class="ot">&lt;-</span> <span class="fu">calculateIIF</span>(<span class="at">B =</span> items_sim<span class="sc">$</span>difficulty, <span class="at">theta =</span> <span class="dv">0</span>)</span></code></pre></div>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>items_mini[, <span class="st">&quot;IIF_0&quot;</span>] <span class="ot">&lt;-</span> <span class="fu">calculateIIF</span>(<span class="at">B =</span> items_mini<span class="sc">$</span>difficulty, <span class="at">theta =</span> <span class="dv">0</span>)</span></code></pre></div>
+<p>In Table 1 you can see the first five items of the item pool.</p>
+<table>
+<caption>Table 1. First 5 Items of the Item Pool</caption>
+<thead>
+<tr class="header">
+<th align="right">item</th>
+<th align="left">format</th>
+<th align="right">time</th>
+<th align="right">difficulty</th>
+<th align="right">IIF_0</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">mc</td>
+<td align="right">27.786</td>
+<td align="right">-1.881</td>
+<td align="right">0.1090032</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">mc</td>
+<td align="right">15.453</td>
+<td align="right">0.843</td>
+<td align="right">0.4494582</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">mc</td>
+<td align="right">31.016</td>
+<td align="right">1.119</td>
+<td align="right">0.3266106</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">mc</td>
+<td align="right">29.874</td>
+<td align="right">0.729</td>
+<td align="right">0.5033924</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">mc</td>
+<td align="right">23.134</td>
+<td align="right">-0.489</td>
+<td align="right">0.6108816</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="objective-function" class="section level2">
 <h2>Objective Function</h2>
-<p>Next, the objective function is defined: The <code>TIF</code> should be maximized at medium ability. For this, we use the <code>maxConstraint()</code> function.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>testInfo <span class="ot">&lt;-</span> <span class="fu">maxConstraint</span>(<span class="at">nForms =</span> <span class="dv">1</span>, <span class="at">itemValues =</span> items_sim<span class="sc">$</span>IIF,</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">itemIDs =</span> items_sim<span class="sc">$</span>id)</span></code></pre></div>
+<p>Next, the objective function is defined: The <code>TIF</code> should be maximized at medium ability. For this, we use the <code>maxObjective()</code> function.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>testInfo <span class="ot">&lt;-</span> <span class="fu">maxObjective</span>(<span class="at">nForms =</span> <span class="dv">1</span>, <span class="at">itemValues =</span> items_mini<span class="sc">$</span>IIF,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">itemIDs =</span> items_mini<span class="sc">$</span>item)</span></code></pre></div>
 </div>
 <div id="constraints" class="section level2">
 <h2>Constraints</h2>
 <p>Our further, fixed constraints are defined as additional constraint objects.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>itemNumber <span class="ot">&lt;-</span> <span class="fu">itemsPerFormConstraint</span>(<span class="at">nForms =</span> <span class="dv">1</span>, <span class="at">operator =</span> <span class="st">&quot;=&quot;</span>, </span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">targetValue =</span> <span class="dv">10</span>, </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">itemIDs =</span> items_sim<span class="sc">$</span>id)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">itemIDs =</span> items_mini<span class="sc">$</span>item)</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>itemUsage <span class="ot">&lt;-</span> <span class="fu">itemUsageConstraint</span>(<span class="at">nForms =</span> <span class="dv">1</span>, <span class="at">operator =</span> <span class="st">&quot;&lt;=&quot;</span>, </span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">targetValue =</span> <span class="dv">1</span>, </span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">itemIDs =</span> items_sim<span class="sc">$</span>id)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">itemIDs =</span> items_mini<span class="sc">$</span>item)</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>testTime <span class="ot">&lt;-</span> <span class="fu">itemValuesDeviation</span>(<span class="at">nForms =</span> <span class="dv">1</span>, </span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                                <span class="at">itemValues =</span> items_sim<span class="sc">$</span>mean_time,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>testTime <span class="ot">&lt;-</span> <span class="fu">itemValuesDeviationConstraint</span>(<span class="at">nForms =</span> <span class="dv">1</span>, </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                                <span class="at">itemValues =</span> items_mini<span class="sc">$</span>time,</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                                <span class="at">targetValue =</span> <span class="dv">8</span> <span class="sc">*</span> <span class="dv">60</span>, </span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                                <span class="at">allowedDeviation =</span> <span class="dv">5</span>,</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                                <span class="at">relative =</span> <span class="cn">FALSE</span>, </span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>                                <span class="at">itemIDs =</span> items_sim<span class="sc">$</span>id)</span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>                                <span class="at">itemIDs =</span> items_mini<span class="sc">$</span>item)</span></code></pre></div>
 <p>Alternatively, we could determine the appropriate test time based on the item pool using the <code>autoItemValuesMinMax()</code> function.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>testTime2 <span class="ot">&lt;-</span> <span class="fu">autoItemValuesMinMax</span>(<span class="at">nForms =</span> <span class="dv">1</span>, </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">itemValues =</span> items_sim<span class="sc">$</span>mean_time,</span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>testTime2 <span class="ot">&lt;-</span> <span class="fu">autoItemValuesMinMaxConstraint</span>(<span class="at">nForms =</span> <span class="dv">1</span>, </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">itemValues =</span> items_mini<span class="sc">$</span>time,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">testLength =</span> <span class="dv">10</span>, </span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">allowedDeviation =</span> <span class="dv">5</span>,</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                                <span class="at">relative =</span> <span class="cn">FALSE</span>, </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                                <span class="at">itemIDs =</span> items_sim<span class="sc">$</span>id)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The minimum and maximum values per test form are: min = 415.26 - max = 425.26</span></span></code></pre></div>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                                <span class="at">itemIDs =</span> items_mini<span class="sc">$</span>item)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The minimum and maximum values per test form are: min = 418.09 - max = 428.09</span></span></code></pre></div>
 </div>
 <div id="solver-usage" class="section level2">
 <h2>Solver usage</h2>
@@ -200,68 +258,68 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; GLPK Simplex Optimizer, v4.47</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34 rows, 31 columns, 151 non-zeros</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       0: obj =  0.000000000e+000  infeas = 4.850e+002 (1)</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; *    14: obj =  0.000000000e+000  infeas = 4.441e-016 (0)</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; *    34: obj =  6.719704076e+000  infeas = 0.000e+000 (0)</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; *    14: obj =  0.000000000e+000  infeas = 2.220e-016 (0)</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; *    34: obj =  6.734471402e+000  infeas = 0.000e+000 (0)</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; OPTIMAL SOLUTION FOUND</span></span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; GLPK Integer Optimizer, v4.47</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34 rows, 31 columns, 151 non-zeros</span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30 integer variables, all of which are binary</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Integer optimization begins...</span></span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; +    34: mip =     not found yet &lt;=              +inf        (1; 0)</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; +    51: &gt;&gt;&gt;&gt;&gt;  6.345959248e+000 &lt;=  6.716532093e+000   5.8% (10; 0)</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; +    56: &gt;&gt;&gt;&gt;&gt;  6.712004599e+000 &lt;=  6.712004599e+000   0.0% (10; 7)</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; +    56: mip =  6.712004599e+000 &lt;=     tree is empty   0.0% (0; 27)</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; +    60: &gt;&gt;&gt;&gt;&gt;  5.989006125e+000 &lt;=  6.732773863e+000  12.4% (17; 0)</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; +    66: &gt;&gt;&gt;&gt;&gt;  6.729573876e+000 &lt;=  6.729573876e+000   0.0% (16; 11)</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; +    66: mip =  6.729573876e+000 &lt;=     tree is empty   0.0% (0; 43)</span></span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INTEGER OPTIMAL SOLUTION FOUND</span></span></code></pre></div>
 </div>
 <div id="inspect-solution" class="section level2">
 <h2>Inspect solution</h2>
 <p>The solution can be inspected directly via <code>inspectSolution()</code> or appended to the item pool via <code>appendSolution()</code>. Using the <code>inspectSolution()</code> function an additional row is created that calculates the column sums for all numeric variables.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">inspectSolution</span>(solver_out, <span class="at">items =</span> items_sim, <span class="at">idCol =</span> <span class="st">&quot;id&quot;</span>)</span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">inspectSolution</span>(solver_out, <span class="at">items =</span> items_mini, <span class="at">idCol =</span> <span class="st">&quot;item&quot;</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $form_1</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      id format mean_time  difficulty   theta=0</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1     mc  29.54138  0.03019108 0.7220244</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13   13   open  38.81086 -0.33968639 0.6654634</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15   15   open  25.30197 -0.19227341 0.7035404</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16   16   open  69.92575 -0.65288754 0.5388101</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18   18   open  44.58367  0.04727869 0.7213344</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19   19   open  62.42280  0.33837743 0.6658788</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20   20   open  86.91120 -0.44677154 0.6275614</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22   22  order  40.40665  0.37084738 0.6552107</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24   24  order  30.83387 -0.17304691 0.7070911</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27   27  order  48.69160  0.18411508 0.7050898</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Sum 175   &lt;NA&gt; 477.42976 -0.83385614 6.7120046</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">appendSolution</span>(solver_out, <span class="at">items =</span> items_sim, <span class="at">idCol =</span> <span class="st">&quot;id&quot;</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    id format mean_time  difficulty   theta=0 form_1</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   1     mc 29.541377  0.03019108 0.7220244      1</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2   2     mc 25.040617 -0.58029174 0.5717449      0</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3   3     mc 30.952331  1.79059604 0.1254506      0</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4   4     mc 37.554676 -0.46439976 0.6206603      0</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5   5     mc 27.345274 -0.52650959 0.5951304      0</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6   6     mc 24.960790 -0.28648377 0.6812958      0</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7   7     mc 22.449372  0.29689958 0.6783710      0</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8   8     mc 21.648790 -0.87213286 0.4357964      0</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9   9     mc 24.044253  1.07571901 0.3445996      0</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10 10     mc 21.594588 -0.25230142 0.6902641      0</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11 11   open 82.922469  1.13700527 0.3191851      0</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12 12   open 85.285402 -0.76846443 0.4846056      0</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13 13   open 38.810862 -0.33968639 0.6654634      1</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14 14   open 65.312240 -1.25831226 0.2723894      0</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15 15   open 25.301969 -0.19227341 0.7035404      1</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16 16   open 69.925753 -0.65288754 0.5388101      1</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17 17   open 74.558120  1.03858357 0.3605237      0</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18 18   open 44.583666  0.04727869 0.7213344      1</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19 19   open 62.422802  0.33837743 0.6658788      1</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20 20   open 86.911204 -0.44677154 0.6275614      1</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21 21  order 33.284070  0.81977272 0.4603699      0</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22 22  order 40.406652  0.37084738 0.6552107      1</span></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23 23  order 38.419331 -1.17782688 0.3028989      0</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24 24  order 30.833874 -0.17304691 0.7070911      1</span></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25 25  order 36.477034 -0.92835911 0.4097768      0</span></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26 26  order  7.130145  0.96061901 0.3950889      0</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27 27  order 48.691605  0.18411508 0.7050898      1</span></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28 28  order 49.235210 -1.82611791 0.1187312      0</span></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29 29  order 31.675337  0.67348514 0.5292601      0</span></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30 30  order 43.453273  1.01279383 0.3717969      0</span></span></code></pre></div>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     item format      time  difficulty   theta=0</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8      8     mc  30.21856 -0.36707654 0.6564876</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14    14   open  62.99738  0.58136415 0.5712686</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15    15   open  56.59458 -0.12012428 0.7150196</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20    20   open  87.05063  0.10201223 0.7170949</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22    22  order  39.92415  0.15006395 0.7108712</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24    24  order  40.52289 -0.53606969 0.5910511</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25    25  order  52.15832  0.14083641 0.7122442</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26    26  order  38.29060  0.02381911 0.7222039</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28    28  order  43.77592  0.41298287 0.6403034</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29    29  order  25.55363  0.24091747 0.6930294</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Sum  211   &lt;NA&gt; 477.08666  0.62872568 6.7295739</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">appendSolution</span>(solver_out, <span class="at">items =</span> items_mini, <span class="at">idCol =</span> <span class="st">&quot;item&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item format     time  difficulty    theta=0 form_1</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1     mc 27.78586 -1.88090278 0.10900318      0</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     2     mc 15.45258  0.84295865 0.44945822      0</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     3     mc 31.01590  1.11881538 0.32661056      0</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     4     mc 29.87421  0.72867743 0.50339241      0</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     5     mc 23.13401 -0.48870993 0.61088162      0</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     6     mc 25.19305  0.47273874 0.61733915      0</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7     7     mc 25.66340 -1.18054268 0.30183441      0</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8     8     mc 30.21856 -0.36707654 0.65648760      1</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9     9     mc 26.61642 -0.56879434 0.57682871      0</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10   10     mc 15.35510  1.35397237 0.23900562      0</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11   11   open 65.85163 -0.75879786 0.48917461      0</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12   12   open 35.94400  2.49927381 0.04012039      0</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13   13   open 78.85030  1.33165799 0.24650909      0</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14   14   open 62.99738  0.58136415 0.57126860      1</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15   15   open 56.59458 -0.12012428 0.71501958      1</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16   16   open 45.12778 -1.28629686 0.26229560      0</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17   17   open 48.11908 -0.86124314 0.44088544      0</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18   18   open 76.32293  0.76977036 0.48398822      0</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19   19   open 76.20244 -1.39388826 0.22601541      0</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20   20   open 87.05063  0.10201223 0.71709486      1</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21   21  order 22.47400 -0.43147145 0.63341304      0</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22   22  order 39.92415  0.15006395 0.71087118      1</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23   23  order 57.71593 -0.82071059 0.45992776      0</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24   24  order 40.52289 -0.53606969 0.59105111      1</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25   25  order 52.15832  0.14083641 0.71224418      1</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26   26  order 38.29060  0.02381911 0.72220392      1</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27   27  order 45.97548  2.79595336 0.02450104      0</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28   28  order 43.77592  0.41298287 0.64030341      1</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29   29  order 25.55363  0.24091747 0.69302944      1</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30   30  order 19.50162 -0.51434114 0.60026891      0</span></span></code></pre></div>
 </div>
 
 

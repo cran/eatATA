@@ -95,23 +95,23 @@ computeTargetValues(itemInformations, nForms = 3, allowedDeviation = .10,
    relative = TRUE, testLength = 10)
 
 
-## items$MC is dummy variable indication which items in the pool are multiple choise
-str(items$MC)
+## items_vera$MC is dummy variable indication which items in the pool are multiple choise
+str(items_vera$MC)
 
 ## when used as a numerical vector, the dummy is not treated as a categorical
 ## indicator, but rather as a numerical value.
-computeTargetValues(items$MC, nForms = 14)
-computeTargetValues(items$MC, nForms = 14, allowedDeviation = 1)
+computeTargetValues(items_vera$MC, nForms = 14)
+computeTargetValues(items_vera$MC, nForms = 14, allowedDeviation = 1)
 
 ## Therefore, it is best to convert dummy variables into a factor, so that
 ## automatically freqyencies are returned
-MC_factor <- factor(items$MC, labels = c("not MC", "MC"))
+MC_factor <- factor(items_vera$MC, labels = c("not MC", "MC"))
 computeTargetValues(MC_factor, nForms = 14)
 computeTargetValues(MC_factor, nForms = 3)
 
 ## The computed minimum and maximum frequencies can be used to create contstraints.
 MC_ranges <- computeTargetValues(MC_factor, nForms = 3)
-itemCategoryRange(3, MC_factor, range = MC_ranges)
+itemCategoryRangeConstraint(3, MC_factor, range = MC_ranges)
 
 ## When desired, the automatically computed range can be adjusted by hand. This
 ##  can be of use when only a limited set of the categories should be constrained.
@@ -121,6 +121,6 @@ itemCategoryRange(3, MC_factor, range = MC_ranges)
 ##  Or to other sensible values.
 MC_ranges["not MC", ] <- c(0, 40)
 MC_ranges
-itemCategoryRange(3, MC_factor, range = MC_ranges)
+itemCategoryRangeConstraint(3, MC_factor, range = MC_ranges)
 
 }

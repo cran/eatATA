@@ -24,15 +24,15 @@
 #'                      stringsAsFactors = FALSE)
 #'
 #' # Create tuples
-#' exTuples2 <- itemExclusionTuples(items = items, idCol = "ID", exclusions = "exclusions",
+#' exTuples2 <- itemTuples(items = items, idCol = "ID", infoCol = "exclusions",
 #'                     sepPattern = ", ")
 #'
 #' #' ## Create constraints
-#' exclusion_constraint <- itemExclusionConstraint(nForms = 2, exclusionTuples = exTuples2,
+#' exclusion_constraint <- itemExclusionConstraint(nForms = 2, itemTuples = exTuples2,
 #'                                                 itemIDs = items$ID)
 #' depletion_constraint <- depletePoolConstraint(2, nItems = 4,
 #'                                                 itemIDs = items$ID)
-#' target_constraint <- minimaxConstraint(nForms = 2,
+#' target_constraint <- minimaxObjective(nForms = 2,
 #'                                           itemValues = c(3, 1.5, 2, 4),
 #'                                           targetValue = 1,
 #'                                           itemIDs = items$ID)

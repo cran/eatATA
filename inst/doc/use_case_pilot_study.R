@@ -45,32 +45,32 @@ nForms <- 14           # number of blocks
 
 ## ----target constraints-------------------------------------------------------
 # optimize average time
-av_time <- minimaxConstraint(nForms, itemValues = items$RT_in_min, targetValue = 10,
-                             itemIDs = items$Item_ID)
+av_time <- minimaxObjective(nForms, itemValues = items$time, targetValue = 10,
+                             itemIDs = items$item)
 
 ## ----item usage constraints---------------------------------------------------
 itemOverlap <- itemUsageConstraint(nForms, targetValue = 1, 
-                                   operator = "=", itemIDs = items$Item_ID) 
+                                   operator = "=", itemIDs = items$item) 
 
 ## ----categorical constraints--------------------------------------------------
 # item formats
-mc_openItems <- autoItemValuesMinMax(nForms = nForms, itemValues = items$MC_open_none, 
-                                     itemIDs = items$Item_ID)
-cmcItems <- autoItemValuesMinMax(nForms = nForms, itemValues = items$f_CMC, itemIDs = items$Item_ID)
-saItems <- autoItemValuesMinMax(nForms = nForms, itemValues = items$short_answer, 
-                                allowedDeviation = 1, itemIDs = items$Item_ID)
+mc_openItems <- autoItemValuesMinMaxConstraint(nForms = nForms, itemValues = items$MC_open_none, 
+                                     itemIDs = items$item)
+cmcItems <- autoItemValuesMinMaxConstraint(nForms = nForms, itemValues = items$f_CMC, itemIDs = items$item)
+saItems <- autoItemValuesMinMaxConstraint(nForms = nForms, itemValues = items$short_answer, 
+                                allowedDeviation = 1, itemIDs = items$item)
 
 # difficulty categories
-Items1 <- autoItemValuesMinMax(nForms = nForms, itemValues = items$diff_1, 
-                               allowedDeviation = 1, itemIDs = items$Item_ID)
-Items2 <- autoItemValuesMinMax(nForms = nForms, itemValues = items$diff_2, 
-                               allowedDeviation = 1, itemIDs = items$Item_ID)
-Items3 <- autoItemValuesMinMax(nForms = nForms, itemValues = items$diff_3, 
-                               allowedDeviation = 1, itemIDs = items$Item_ID)
-Items4 <- autoItemValuesMinMax(nForms = nForms, itemValues = items$diff_4, 
-                               allowedDeviation = 1, itemIDs = items$Item_ID)
-Items5 <- autoItemValuesMinMax(nForms = nForms, itemValues = items$diff_5, 
-                               allowedDeviation = 1, itemIDs = items$Item_ID)
+Items1 <- autoItemValuesMinMaxConstraint(nForms = nForms, itemValues = items$diff_1, 
+                               allowedDeviation = 1, itemIDs = items$item)
+Items2 <- autoItemValuesMinMaxConstraint(nForms = nForms, itemValues = items$diff_2, 
+                               allowedDeviation = 1, itemIDs = items$item)
+Items3 <- autoItemValuesMinMaxConstraint(nForms = nForms, itemValues = items$diff_3, 
+                               allowedDeviation = 1, itemIDs = items$item)
+Items4 <- autoItemValuesMinMaxConstraint(nForms = nForms, itemValues = items$diff_4, 
+                               allowedDeviation = 1, itemIDs = items$item)
+Items5 <- autoItemValuesMinMaxConstraint(nForms = nForms, itemValues = items$diff_5, 
+                               allowedDeviation = 1, itemIDs = items$item)
 
 ## ----exclusion demo-----------------------------------------------------------
 # item exclusions variable
@@ -78,16 +78,16 @@ items$exclusions[1:5]
 
 ## ----exclusion constraints----------------------------------------------------
 # item exclusions
-exclusionTuples <- itemExclusionTuples(items, idCol = "Item_ID", 
-                                       exclusions = "exclusions", sepPattern = ", ")
-excl_constraints <- itemExclusionConstraint(nForms = 14, exclusionTuples = exclusionTuples, 
-                                            itemIDs = items$Item_ID)
+exclusionTuples <- itemTuples(items, idCol = "item", 
+                                       infoCol = "exclusions", sepPattern = ", ")
+excl_constraints <- itemExclusionConstraint(nForms = 14, itemTuples = exclusionTuples, 
+                                            itemIDs = items$item)
 
 ## ----item numbers constraints-------------------------------------------------
 # number of items per test form
 min_Nitems <- floor(nItems / nForms) - 3
 noItems <- itemsPerFormConstraint(nForms = nForms, operator = ">=", 
-                                  targetValue = min_Nitems, itemIDs = items$Item_ID)
+                                  targetValue = min_Nitems, itemIDs = items$item)
 
 
 ## ----prepare constraints, eval = T--------------------------------------------
@@ -100,7 +100,7 @@ constr_list <- list(itemOverlap, mc_openItems, cmcItems, saItems,
 ## ----solver_local, eval = FALSE, echo = FALSE---------------------------------
 #  # Local optimization chunk; prevents occasional errors on servers if no feasible solution is found
 #  output_local <- capture.output(solver_raw_local <- useSolver(constr_list, nForms = nForms, nItems = nItems,
-#                          itemIDs = items$Item_ID, solver = "GLPK", timeLimit = 30))
+#                          itemIDs = items$item, solver = "GLPK", timeLimit = 30))
 #  saveRDS(solver_raw_local, "use_case_solver_out.RDS")
 #  saveRDS(output_local, "use_case_output.RDS")
 #  
@@ -108,7 +108,7 @@ constr_list <- list(itemOverlap, mc_openItems, cmcItems, saItems,
 ## ----solver, eval = FALSE, message=TRUE---------------------------------------
 #  # Optimization
 #  solver_raw <- useSolver(constr_list, nForms = nForms, nItems = nItems,
-#                          itemIDs = items$Item_ID, solver = "GLPK", timeLimit = 10)
+#                          itemIDs = items$item, solver = "GLPK", timeLimit = 10)
 #  
 
 ## ----solver_load, eval = TRUE, echo = FALSE-----------------------------------
@@ -118,8 +118,8 @@ output_local
 message("The solution is feasible, but may not be optimal")
 
 ## ----inspect solution---------------------------------------------------------
-out_list <- inspectSolution(solver_raw, items = items, idCol = "Item_ID", colSums = TRUE,
-                            colNames = c("RT_in_min", "subitems", 
+out_list <- inspectSolution(solver_raw, items = items, idCol = "item", colSums = TRUE,
+                            colNames = c("time", "subitems", 
                                          "MC", "CMC", "short_answer", "open",
                                          paste0("diff_", 1:5)))
 
@@ -127,12 +127,12 @@ out_list <- inspectSolution(solver_raw, items = items, idCol = "Item_ID", colSum
 out_list[1:2]
 
 ## ----block exclusions---------------------------------------------------------
-analyzeBlockExclusion(solverOut = solver_raw, item = items, idCol = "Item_ID", 
+analyzeBlockExclusion(solverOut = solver_raw, item = items, idCol = "item", 
                       exclusionTuples = exclusionTuples)
 
 
 ## ----append solution----------------------------------------------------------
-out_df <- appendSolution(solver_raw, items = items, idCol = "Item_ID")
+out_df <- appendSolution(solver_raw, items = items, idCol = "item")
 
 ## ----export solution to excel, eval = FALSE-----------------------------------
 #  devtools::install_github("beckerbenj/eatAnalysis")

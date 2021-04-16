@@ -12,12 +12,12 @@
 #'@examples
 #'# constraint that minimizes the maximum difference per test form value and a
 #'#   target value of 0
-#'minimaxConstraint(nForms = 2,
+#'minimaxObjective(nForms = 2,
 #'                  itemValues = rep(-2:2, 2),
 #'                  targetValue = 0)
 #'
 #'@export
-minimaxConstraint <- function(nForms, itemValues, targetValue, weight = 1,
+minimaxObjective <- function(nForms, itemValues, targetValue, weight = 1,
                               whichForms = seq_len(nForms), info_text = NULL,
                               itemIDs = names(itemValues)){
 
@@ -49,7 +49,7 @@ minimaxConstraint <- function(nForms, itemValues, targetValue, weight = 1,
 #' overflow by means of a maximally allowed deviation \code{allowedDeviation}.
 #'
 #'@inheritParams itemValuesConstraint
-#'@inheritParams minimaxConstraint
+#'@inheritParams minimaxObjective
 #'@param allowedDeviation the maximum allowed deviation between the sum of the target values.
 #'
 #'@return An object of class \code{"constraint"}.
@@ -57,11 +57,11 @@ minimaxConstraint <- function(nForms, itemValues, targetValue, weight = 1,
 #'@examples
 #'# constraint that minimizes the maximum difference per test form value and a
 #'#   target value of 0
-#'maximinConstraint(nForms = 2, itemValues = rep(-2:2, 2),
+#'maximinObjective(nForms = 2, itemValues = rep(-2:2, 2),
 #'                  allowedDeviation = 1)
 #'
 #'@export
-maximinConstraint <- function(nForms, itemValues, allowedDeviation,
+maximinObjective <- function(nForms, itemValues, allowedDeviation,
                               weight = 1, whichForms = seq_len(nForms), info_text = NULL,
                               itemIDs = names(itemValues)){
 
@@ -94,20 +94,26 @@ maximinConstraint <- function(nForms, itemValues, allowedDeviation,
 #' Create \code{maximin}-constraints related to an item parameter/value. That is, the created
 #' constraints can be used to maximize the minimal sum of the
 #' item values (\code{itemValues}), while at the same time automatically setting
-#' an ideal upper limit to the overflow.
+#' an ideal upper limit to the overflow. More specifically, the \code{capped minimax}
+#' method described by Luo (2020) is used.
 #'
 #'@inheritParams itemValuesConstraint
-#'@inheritParams minimaxConstraint
+#'@inheritParams minimaxObjective
 #'
 #'@return An object of class \code{"constraint"}.
 #'
 #'@examples
 #'# constraint that minimizes the maximum difference per test form value and a
 #'#   target value of 0
-#'cappedMaximinConstraint(nForms = 2, itemValues = rep(-2:2, 2))
+#'cappedMaximinObjective(nForms = 2, itemValues = rep(-2:2, 2))
+#'
+#'@references Xiao Luo (2020). Automated Test Assembly with Mixed-Integer Programming:
+#'The Effects of Modeling Approaches and Solvers.
+#'\emph{Journal of Educational Measurement}, 57(4), 547-565.
+#'\url{https://onlinelibrary.wiley.com/doi/10.1111/jedm.12262}
 #'
 #'@export
-cappedMaximinConstraint <- function(nForms, itemValues, weight = 1,
+cappedMaximinObjective <- function(nForms, itemValues, weight = 1,
                                     whichForms = seq_len(nForms), info_text = NULL,
                                     itemIDs = names(itemValues)){
 
@@ -142,16 +148,16 @@ cappedMaximinConstraint <- function(nForms, itemValues, weight = 1,
 #' Note that this constraint can only be used when only one test form has to be assembled.
 #'
 #'@inheritParams itemValuesConstraint
-#'@inheritParams minimaxConstraint
+#'@inheritParams minimaxObjective
 #'
 #'@return An object of class \code{"constraint"}.
 #'
 #'@examples
 #'# constraint that maximizes the sum of the itemValues
-#'maxConstraint(nForms = 1, itemValues = rep(-2:2, 2))
+#'maxObjective(nForms = 1, itemValues = rep(-2:2, 2))
 #'
 #'@export
-maxConstraint <- function(nForms, itemValues, weight = 1,
+maxObjective <- function(nForms, itemValues, weight = 1,
                           whichForms = seq_len(nForms), info_text = NULL,
                           itemIDs = names(itemValues)){
 
@@ -174,16 +180,16 @@ maxConstraint <- function(nForms, itemValues, weight = 1,
 #' Note that this constraint can only be used when only one test form has to be assembled.
 #'
 #'@inheritParams itemValuesConstraint
-#'@inheritParams minimaxConstraint
+#'@inheritParams minimaxObjective
 #'
 #'@return An object of class \code{"constraint"}.
 #'
 #'@examples
 #'# constraint that maximizes the sum of the itemValues
-#'maxConstraint(nForms = 1, itemValues = rep(-2:2, 2))
+#'maxObjective(nForms = 1, itemValues = rep(-2:2, 2))
 #'
 #'@export
-minConstraint <- function(nForms, itemValues, weight = 1,
+minObjective <- function(nForms, itemValues, weight = 1,
                           whichForms = seq_len(nForms), info_text = NULL,
                           itemIDs = names(itemValues)){
 
