@@ -1,7 +1,7 @@
 Package: eatATA
 Type: Package
 Title: Create Constraints for Small Test Assembly Problems
-Version: 0.11.1
+Version: 0.11.2
 Authors@R: c(
     person("Benjamin", "Becker", email = "b.becker@iqb.hu-berlin.de", role = c("aut", "cre")),
     person("Dries", "Debeer", email = "dries.debeer@kuleuven.be", role = c("aut")))
@@ -21,9 +21,9 @@ Suggests: testthat (>= 2.1.0), covr, knitr, rmarkdown, readxl,
 Enhances: gurobi
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2021-04-16 15:18:05 UTC; beckerbz
+Packaged: 2021-04-28 17:09:16 UTC; beckerbz
 Author: Benjamin Becker [aut, cre],
   Dries Debeer [aut]
 Maintainer: Benjamin Becker <b.becker@iqb.hu-berlin.de>
 Repository: CRAN
-Date/Publication: 2021-04-16 15:30:09 UTC
+Date/Publication: 2021-05-03 00:20:19 UTC

@@ -1,6 +1,6 @@
-83a1009c4c34089f92afe04b8b3e354c *DESCRIPTION
+b0b72eb6070a44ab6ec99888aafdc114 *DESCRIPTION
 029ccc14d9499023b886a2c4f41de260 *NAMESPACE
-a12c2587b6553e06d995780ed9b07f41 *NEWS.md
+5d56a5c90a60b0b09bc0864735d97c44 *NEWS.md
 9f7b5275b1166d3154cc36bbce319051 *R/analyzeBlockExclusion.R
 9ceeaf722b32e92777f4ba636a01afff *R/analyzeComplexBlockExclusion.R
 352925cf84a58dacb20d42421930b80b *R/appendSolution.R
@@ -37,13 +37,13 @@ dcf496744f361797e9ed1ad0d2e69521 *data/items_lsa.rda
 2e6d93e404dcaad66b285399198ace67 *data/items_vera.rda
 1b632e3701eb4205a9ff7de3a9b68606 *inst/doc/minimal_example.R
 f087c037884d49e5e87cb551f15fa1db *inst/doc/minimal_example.Rmd
-7255aa46db040ddec00df9147e70feb2 *inst/doc/minimal_example.html
+e1d5cedf1c91fc77857de1905c212cc8 *inst/doc/minimal_example.html
 ea51d6907efcb90fad0136e727cb91dc *inst/doc/overview.R
 b8f86a0d8d74e0ec7f79a3386188bb91 *inst/doc/overview.Rmd
-97cb0a9130d58aed096c08bcf0f8bd08 *inst/doc/overview.html
+e282100448d2a21c5ac000b90d8c0dc0 *inst/doc/overview.html
 170a68744462608b4b28bec177e22660 *inst/doc/use_case_pilot_study.R
 d751ebb3940fbc8eb9b1f6f316705679 *inst/doc/use_case_pilot_study.Rmd
-91c822be08f1ebd6d79fee5a43217400 *inst/doc/use_case_pilot_study.html
+825e045a7e0e4a82bd3a89338c088a95 *inst/doc/use_case_pilot_study.html
 872f3a1e4f426611324d9a0b32aadcfc *inst/extdata/items.xlsx
 93cbe9f4edc1115c31d61534c1e4bef7 *man/analyzeBlockExclusion.Rd
 4d7e3a1f64426d825fedc3cc500adc51 *man/analyzeComplexBlockExclusion.Rd
@@ -103,7 +103,7 @@ c924fa323e24faf78592fcd7a6cd24ea *tests/testthat/test_itemValuesConstraint.R
 1325a1c4366298f79f207597a71231b0 *tests/testthat/test_matrixExclusionTuples.R
 e71dd9de2bdcc7a07825d43732b0eeaf *tests/testthat/test_objectiveConstraint.R
 678e9b7e216298044c984f5db4156863 *tests/testthat/test_stemInclusionTuples.R
-f2ee1247995a64cb080a696dfc258eda *tests/testthat/test_useSolver.R
+abb6383ae4e20f52e27e0b2cfbf55e15 *tests/testthat/test_useSolver.R
 1a3de46f65d98dcb14e26c07eafc8a18 *tests/testthat/test_utils.R
 f087c037884d49e5e87cb551f15fa1db *vignettes/minimal_example.Rmd
 b8f86a0d8d74e0ec7f79a3386188bb91 *vignettes/overview.Rmd
