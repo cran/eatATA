@@ -1,10 +1,24 @@
 #' Constrain the sum of item values per form.
 #'
-#' Create constraints related to an item parameter/value. That is, the created
+#' \loadmathjax Create constraints related to an item parameter/value. That is, the created
 #' constraints assure that the sum of the item values (\code{itemValues}) per test form is either
 #' (a) smaller than or equal to (\code{operator = "<="}), (b) equal to
 #' (\code{operator = "="}), or (c) greater than or equal to (\code{operator = ">="})
 #' the chosen \code{targetValue}.
+#'
+#' When \code{operator} is \code{"<="}, the constraint can be mathematically formulated as:
+#' \mjsdeqn{\sum_{i=1}^{I} v_i \times x_{if} \leq t , \; \; \; \code{for} \:  f \in G,}
+#' where \mjseqn{I} refers to the number of items in the item pool, \mjseqn{v_i} is the
+#' \code{itemValue} for item \mjseqn{i} and \mjseqn{t} is the \code{targetValue}. Further, \mjseqn{G}
+#' corresponds to \code{whichForms}, so that the above inequality constraint
+#' is repeated for every test form \mjseqn{f} in \mjseqn{G}. In addition, let \mjseqn{\boldsymbol{x}}
+#' be a vector of binary decision variables with length \mjseqn{I \times F}, where \mjseqn{F}
+#' is \code{nForms}. The binary decision variables \mjseqn{x_{if}} are defined as:
+#' \tabular{lll}{
+#' \mjseqn{\;\;\;\;\;\;\;\;} \tab \mjseqn{x_{if} = 1},\mjseqn{\;\;\;\;}  \tab if item \mjseqn{i} is assigned to form \mjseqn{f}, and  \cr
+#' \mjseqn{\;\;\;\;\;\;\;\;} \tab \mjseqn{x_{if} = 0},\mjseqn{\;\;\;\;}  \tab otherwise.
+#' }
+#'
 #'
 #'@param nForms Number of forms to be created.
 #'@param itemValues Item parameter/values for which the sum per test form should be constrained.
@@ -34,24 +48,28 @@ itemValuesConstraint <- function(nForms, itemValues,
                                  info_text = NULL,
                                  itemIDs = names(itemValues)){
 
-  operator <- match.arg(operator)
+  # Do checks
+  check_out <- do_checks_eatATA(
+    nItems = NULL,
+    itemIDs = itemIDs,
+    itemValues = itemValues,
+    operator = operator,
+    nForms = nForms,
+    targetValue = targetValue,
+    info_text = info_text,
+    whichItems = NULL,
+    itemValuesName = deparse(substitute(itemValues)))
 
-  # all arguments should be of lenght 1
-  check <- sapply(list(nForms, operator, targetValue), length) == 1
-  if(any(!check)) stop("The following arguments should have length 1: 'nForms', 'operator', 'targetValue'.")
+  nItems <- check_out$nItems
+  itemIDs <- check_out$itemIDs
+  itemValues <- check_out$itemValues
+  operator <- check_out$operator
+  info_text <- check_out$info_text
 
-  # itemValues should have length equal to itemIDs
-  if(!is.null(itemIDs) && length(itemValues) != length(itemIDs)) stop("The length of 'itemValues' should be equal to 'itemIDs'.")
 
   # the targetValue should be smaller than or equal to the sum of the itemValues
   if(targetValue > sum(itemValues)) stop("The 'targetValue' should be smaller than the sum of the 'itemValues'.")
 
-  # choose info_text for info
-  if(is.null(info_text)) info_text <- paste0(deparse(substitute(itemValues)), operator, targetValue)
-
-  if(length(info_text) > 1) stop("'info_text' should be a character string of length 1.")
-
-  check_itemIDs(itemIDs)
 
   makeFormConstraint(nForms, itemValues, realVar = NULL,
                      operator, targetValue,

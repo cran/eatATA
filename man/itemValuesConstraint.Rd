@@ -35,11 +35,25 @@ or \code{">="}. See details for more information.}
 An object of class \code{"constraint"}.
 }
 \description{
-Create constraints related to an item parameter/value. That is, the created
+\loadmathjax Create constraints related to an item parameter/value. That is, the created
 constraints assure that the sum of the item values (\code{itemValues}) per test form is either
 (a) smaller than or equal to (\code{operator = "<="}), (b) equal to
 (\code{operator = "="}), or (c) greater than or equal to (\code{operator = ">="})
 the chosen \code{targetValue}.
+}
+\details{
+When \code{operator} is \code{"<="}, the constraint can be mathematically formulated as:
+\mjsdeqn{\sum_{i=1}^{I} v_i \times x_{if} \leq t , \; \; \; \code{for} \:  f \in G,}
+where \mjseqn{I} refers to the number of items in the item pool, \mjseqn{v_i} is the
+\code{itemValue} for item \mjseqn{i} and \mjseqn{t} is the \code{targetValue}. Further, \mjseqn{G}
+corresponds to \code{whichForms}, so that the above inequality constraint
+is repeated for every test form \mjseqn{f} in \mjseqn{G}. In addition, let \mjseqn{\boldsymbol{x}}
+be a vector of binary decision variables with length \mjseqn{I \times F}, where \mjseqn{F}
+is \code{nForms}. The binary decision variables \mjseqn{x_{if}} are defined as:
+\tabular{lll}{
+\mjseqn{\;\;\;\;\;\;\;\;} \tab \mjseqn{x_{if} = 1},\mjseqn{\;\;\;\;}  \tab if item \mjseqn{i} is assigned to form \mjseqn{f}, and  \cr
+\mjseqn{\;\;\;\;\;\;\;\;} \tab \mjseqn{x_{if} = 0},\mjseqn{\;\;\;\;}  \tab otherwise.
+}
 }
 \examples{
 ## constraints to make sure that the sum of the item values (1:10) is between

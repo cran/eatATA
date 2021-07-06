@@ -12,7 +12,7 @@
 
 <meta name="author" content="Benjamin Becker" />
 
-<meta name="date" content="2021-04-28" />
+<meta name="date" content="2021-07-06" />
 
 <title>Overview of eatATA Functionality</title>
 
@@ -141,11 +141,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">Overview of <code>eatATA</code> Functionality</h1>
 <h4 class="author">Benjamin Becker</h4>
-<h4 class="date">2021-04-28</h4>
+<h4 class="date">2021-07-06</h4>
 
 
 
-<p><code>eatATA</code> efficiently translates test design requirements for Automated Test Assembly (<code>ATA</code>) into constraints for a Mixed Integer Linear Programming Model (MILP). A number of efficient and user-friendly functions are available that translate conceptual test assembly constraints to constraint objects for MILP solver. Currently, <code>GLPK</code>, <code>lpSolve</code>, <code>SYMPHONY</code>, and <code>Gurobi</code> are supported as solvers. In the remainder of this vignette we provide an overview of the functionality of <code>eatATA</code>. A minimal <code>ATA</code> example can be found in the vignette <a href="minimal_example.html">Typical Use of <code>eatATA</code>: a Minimal Example</a>, a more complex use case for a pilot study can be found in the vignette <a href="use_case_pilot_study.html">Typical Use of <code>eatATA</code>: a Pilot Study Example</a>.</p>
+<p><code>eatATA</code> efficiently translates test design requirements for Automated Test Assembly (<code>ATA</code>) into constraints for a Mixed Integer Linear Programming Model (MILP). A number of user-friendly functions are available that translate conceptual test assembly constraints to constraint objects for MILP solver. Currently, <code>GLPK</code>, <code>lpSolve</code>, <code>SYMPHONY</code>, and <code>Gurobi</code> are supported as solvers. In the remainder of this vignette we provide an overview of the functionality of <code>eatATA</code>. A minimal <code>ATA</code> example can be found in the vignette <a href="minimal_example.html">Typical Use of <code>eatATA</code>: a Minimal Example</a>, a more complex use case for a pilot study can be found in the vignette <a href="use_case_pilot_study.html">Typical Use of <code>eatATA</code>: a Pilot Study Example</a>.</p>
 <div id="setup" class="section level2">
 <h2>Setup</h2>
 <p>The <code>eatATA</code> package can be installed from <code>CRAN</code>.</p>
@@ -156,7 +156,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="item-pool-preparation" class="section level2">
 <h2>Item pool preparation</h2>
-<p><code>eatATA</code> provides functions to calculate item information function (<code>calculateIIF()</code>) and expected response times (<code>calculatExpectedRT()</code>). <code>dummiesToFactor()</code> allows the transformation of a variable coded as multiple dummy variables into a single factor. <code>itemExclusionTuples()</code> allows the transformation of item exclusions saved as a single character variable into item exclusion tuples (pairs).</p>
+<p><code>eatATA</code> provides functions to prepare the item pool for test assembly:</p>
+<ul>
+<li><code>calculateIIF()</code></li>
+<li><code>calculatExpectedRT()</code></li>
+<li><code>dummiesToFactor()</code></li>
+<li><code>computeTargetValues()</code></li>
+</ul>
+<p>These functions can be used to calculate the item information function (<code>calculateIIF()</code>) and expected response times (<code>calculatExpectedRT()</code>). <code>dummiesToFactor()</code> allows the transformation of a variable coded as multiple dummy variables into a single factor. <code>computeTargetValues()</code> allows the calculation of target values for test form constraints, but this functionality is also contained in the <code>autoItemValuesMinMax()</code> function.</p>
 <p>There also a number of example item pools included in the package: * <code>items_mini</code>: A small minimal example item pool * <code>items_diao</code>: An item pool modeled after the first problem in Diao &amp; van der Linden (2011) * <code>items_pilot</code>: An item pool for a calibration study * <code>items_lsa</code>: An item pool for the block assembly of a large-scale assessment * <code>items_vera</code>: An item pool similar to a <code>Vergleichsarbeiten</code> item pool</p>
 </div>
 <div id="objective-function" class="section level2">
@@ -173,7 +180,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="constraints" class="section level2">
 <h2>Constraints</h2>
 <p>Here is a list of functions that can be used to set constraints:</p>
-<p>Constraints controlling how often an item should or an be used:</p>
+<p>Constraints controlling how often an item should or can be used:</p>
 <ul>
 <li><code>depletePoolConstraint()</code></li>
 <li><code>itemUsageConstraint()</code></li>
@@ -181,8 +188,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Constraints controlling number of items per test forms:</p>
 <ul>
 <li><code>itemUsageConstraint()</code></li>
+<li><code>itemsPerFormConstraint()</code></li>
 </ul>
-<p>Constraints controlling categorical properties of items across test forms:</p>
+<p>Constraints controlling categorical properties of items per test forms:</p>
 <ul>
 <li><code>itemCategoryConstraint()</code></li>
 <li><code>itemCategoryDeviationConstraint()</code></li>
@@ -190,19 +198,34 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><code>itemCategoryMinConstraint()</code></li>
 <li><code>itemCategoryRangeConstraint()</code></li>
 </ul>
-<p>Constraints controlling metric properties of items across test forms:</p>
+<p>Constraints controlling metric properties of items per test forms:</p>
 <ul>
-<li><code>autoItemValuesMinMax()</code></li>
+<li><code>autoItemValuesMinMaxConstraint()</code></li>
 <li><code>itemValuesConstraint()</code></li>
 <li><code>itemValuesDeviationConstraint()</code></li>
 <li><code>itemValuesMaxConstraint()</code></li>
 <li><code>itemValuesMinConstraint()</code></li>
 <li><code>itemValuesRangeConstraint()</code></li>
 </ul>
+<p>Constraints controlling metric properties of items across test forms:</p>
+<ul>
+<li><code>acrossFormsConstraint()</code></li>
+</ul>
+<p>Constraints controlling item inclusions or exclusions within test forms:</p>
+<ul>
+<li><code>itemExclusionConstraint()</code></li>
+<li><code>itemInclusionConstraint()</code></li>
+</ul>
+<p>Input for the inclusion and exclusion function can be prepared using:</p>
+<ul>
+<li><code>itemTuples()</code></li>
+<li><code>matrixExclusionTuples()</code></li>
+<li><code>stemInclusionTuples()</code></li>
+</ul>
 </div>
 <div id="solver-function" class="section level2">
 <h2>Solver function</h2>
-<p>After defining all required constraints using the functions above, <code>useSolver()</code> can be used to call the desired solver.</p>
+<p>After defining all required constraints using the functions above, <code>useSolver()</code> can be used to call the desired solver. Optionally, constraints can be combined beforehand using the <code>combineConstraint()</code> function.</p>
 </div>
 <div id="using-the-solver-output" class="section level2">
 <h2>Using the solver output</h2>
